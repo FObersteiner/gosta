@@ -13,6 +13,13 @@ Types of changes
 
 ## [Unreleased]
 
+## 2025-07-25, 0.5.1
+
+### Changed
+
+- package management via go.mod
+- some formatting and auto-fixes via golangci-lint
+
 ## 2025-07-25
 
 Forked the repo.
