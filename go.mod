@@ -1,4 +1,4 @@
-module github.com/FObersteiner/gosta
+module github.com/FObersteiner/gosta-server
 
 go 1.24.5
 
