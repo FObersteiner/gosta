@@ -1,10 +1,11 @@
 package endpoint
 
 import (
-	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/models"
 	"sort"
 	"strings"
+
+	entities "github.com/gost/core"
+	"github.com/gost/server/sensorthings/models"
 )
 
 // Endpoint contains all information for creating and handling a main SensorThings endpoint.

@@ -1,12 +1,12 @@
 package endpoint
 
 import (
+	"sort"
 	"testing"
 
 	entities "github.com/gost/core"
 	"github.com/gost/server/sensorthings/models"
 	"github.com/stretchr/testify/assert"
-	"sort"
 )
 
 func TestEndPointGetNameShouldReturnCorrectName(t *testing.T) {
