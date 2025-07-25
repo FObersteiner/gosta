@@ -1,0 +1,56 @@
+# run a single linter, ignoring this config: "golangci-lint run ./... --no-config --enable err113"
+version = "2"
+
+[run]
+go = "1.24"
+timeout = "10m"
+tests = true
+
+[issues]
+max-same-issues = 20
+
+[linters]
+default = "standard"
+
+# enable = [
+#   "containedctx",
+#   "dupl",
+#   "err113",
+#   "errorlint",
+#   "errcheck",
+#   "forcetypeassert",
+#   "gocritic",
+#   "intrange",
+#   "mirror",
+#   "mnd",
+#   "nestif",
+#   "nlreturn",
+#   "perfsprint",
+#   "prealloc",
+#   "recvcheck",
+#   "testifylint",
+#   "unconvert",
+#   "unparam",
+#   "usetesting",
+#   "whitespace",
+#   "wrapcheck",
+#   "wsl_v5",
+# ]
+# disable = [
+#   "cyclop",
+#   "exhaustruct",
+#   "funlen",
+#   "depguard",
+#   "gochecknoglobals",
+#   "gocognit",
+#   "goconst",
+#   "godot",
+#   "godox",
+#   "gosec",
+#   "ireturn",
+#   "lll",
+#   "nonamedreturns",
+#   "paralleltest",
+#   "revive",
+#   "varnamelen",
+# ]
