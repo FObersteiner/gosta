@@ -6,6 +6,7 @@
 *.bin
 *.db
 *.db.lock
+gosta-server
 
 # Folders
 _obj/
@@ -40,3 +41,5 @@ _cgo_export.*
 
 # Logs
 *.log
+
+

@@ -6,10 +6,10 @@ import (
 	"errors"
 	"fmt"
 
+	entities "github.com/FObersteiner/gosta-core"
 	gostErrors "github.com/FObersteiner/gosta-server/errors"
 	"github.com/FObersteiner/gosta-server/sensorthings/odata"
 	"github.com/FObersteiner/gosta-server/timetools"
-	entities "github.com/FObersteiner/gosta-core"
 )
 
 func datastreamParamFactory(values map[string]any) (entities.Entity, error) {

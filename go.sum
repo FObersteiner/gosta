@@ -1,7 +1,10 @@
 github.com/FObersteiner/gosta-core v0.1.0 h1:0OMo2QBwEm137y8j7Yd4Gv+CvjuZEQvvoNlKTX4AcFE=
 github.com/FObersteiner/gosta-core v0.1.0/go.mod h1:acYQ79zYYALX0LweH2xsmevCNwPTnA7ZX+QlROBj4js=
+github.com/FObersteiner/gosta-core v0.1.1 h1:kBm+2ln7SLMi+d1NczQqwKgKfX8wF2wEboq04+HSd7U=
+github.com/FObersteiner/gosta-core v0.1.1/go.mod h1:acYQ79zYYALX0LweH2xsmevCNwPTnA7ZX+QlROBj4js=
 github.com/FObersteiner/gosta-odata v0.1.0 h1:mKDQUzNLZWCQ46JsNPhFC/tcOLm/D/h+0A7TKQVPbOE=
 github.com/FObersteiner/gosta-odata v0.1.0/go.mod h1:mIOCDmD0/iBn2SIp0ZySs+wC81omW+OPNKN7IQXW5mQ=
+github.com/FObersteiner/gosta-odata v0.1.1/go.mod h1:mIOCDmD0/iBn2SIp0ZySs+wC81omW+OPNKN7IQXW5mQ=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
