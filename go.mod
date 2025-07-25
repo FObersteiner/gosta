@@ -3,12 +3,10 @@ module github.com/FObersteiner/gosta-server
 go 1.24.5
 
 require (
+	github.com/FObersteiner/gosta-core v0.1.0
+	github.com/FObersteiner/gosta-odata v0.1.0
 	github.com/eclipse/paho.mqtt.golang v1.5.0
 	github.com/gorilla/mux v1.8.1
-	github.com/gost/core v0.0.0-20190904114132-4d8d9dd7d822
-	github.com/gost/godata v0.0.0-20200707132251-5d9cf5efac7d
-	github.com/gost/now v1.0.0
-	github.com/gost/server v0.0.0-20200707133025-6cd7eb24fa2e
 	github.com/lib/pq v1.10.9
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.10.0

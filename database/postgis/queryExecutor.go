@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	entities "github.com/gost/core"
-	gostLog "github.com/gost/server/log"
-	"github.com/gost/server/sensorthings/odata"
+	entities "github.com/FObersteiner/gosta-core"
+	gostLog "github.com/FObersteiner/gosta-server/log"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
 	log "github.com/sirupsen/logrus"
 )
 

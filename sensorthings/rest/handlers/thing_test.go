@@ -3,11 +3,12 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	entities "github.com/gost/core"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	entities "github.com/FObersteiner/gosta-core"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetThing(t *testing.T) {

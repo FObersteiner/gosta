@@ -1,7 +1,7 @@
 package mqtt
 
 import (
-	"github.com/gost/server/configuration"
+	"github.com/FObersteiner/gosta-server/configuration"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

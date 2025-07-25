@@ -1,18 +1,17 @@
 package postgis
 
 import (
-	"fmt"
-
-	entities "github.com/gost/core"
-
 	"database/sql"
 	"errors"
+	"fmt"
 
-	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/odata"
+	entities "github.com/FObersteiner/gosta-core"
+
+	gostErrors "github.com/FObersteiner/gosta-server/errors"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
 )
 
-func observedPropertyParamFactory(values map[string]interface{}) (entities.Entity, error) {
+func observedPropertyParamFactory(values map[string]any) (entities.Entity, error) {
 	op := &entities.ObservedProperty{}
 
 	for as, value := range values {
@@ -36,7 +35,7 @@ func observedPropertyParamFactory(values map[string]interface{}) (entities.Entit
 }
 
 // GetObservedProperty returns an ObservedProperty by id
-func (gdb *GostDatabase) GetObservedProperty(id interface{}, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
+func (gdb *GostDatabase) GetObservedProperty(id any, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
 	intID, ok := ToIntID(id)
 	if !ok {
 		return nil, gostErrors.NewRequestNotFound(errors.New("ObservedProperty does not exist"))
@@ -53,7 +52,7 @@ func (gdb *GostDatabase) GetObservedProperty(id interface{}, qo *odata.QueryOpti
 }
 
 // GetObservedPropertyByDatastream returns an ObservedProperty by id
-func (gdb *GostDatabase) GetObservedPropertyByDatastream(id interface{}, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
+func (gdb *GostDatabase) GetObservedPropertyByDatastream(id any, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
 	intID, ok := ToIntID(id)
 	if !ok {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
@@ -131,24 +130,24 @@ func (gdb *GostDatabase) PostObservedProperty(op *entities.ObservedProperty) (*e
 }
 
 // PutObservedProperty updates a ObservedProperty in the database
-func (gdb *GostDatabase) PutObservedProperty(id interface{}, op *entities.ObservedProperty) (*entities.ObservedProperty, error) {
+func (gdb *GostDatabase) PutObservedProperty(id any, op *entities.ObservedProperty) (*entities.ObservedProperty, error) {
 	return gdb.PatchObservedProperty(id, op)
 }
 
 // ObservedPropertyExists checks if a ObservedProperty is present in the database based on a given id.
-func (gdb *GostDatabase) ObservedPropertyExists(id interface{}) bool {
+func (gdb *GostDatabase) ObservedPropertyExists(id any) bool {
 	return EntityExists(gdb, id, "observedproperty")
 }
 
 // PatchObservedProperty updates a ObservedProperty in the database
-func (gdb *GostDatabase) PatchObservedProperty(id interface{}, op *entities.ObservedProperty) (*entities.ObservedProperty, error) {
+func (gdb *GostDatabase) PatchObservedProperty(id any, op *entities.ObservedProperty) (*entities.ObservedProperty, error) {
 	var err error
 
 	var ok bool
 
 	var intID int
 
-	updates := make(map[string]interface{})
+	updates := make(map[string]any)
 
 	if intID, ok = ToIntID(id); !ok || !gdb.ObservedPropertyExists(intID) {
 		return nil, gostErrors.NewRequestNotFound(errors.New("ObservedProperty does not exist"))
@@ -176,6 +175,6 @@ func (gdb *GostDatabase) PatchObservedProperty(id interface{}, op *entities.Obse
 }
 
 // DeleteObservedProperty tries to delete a ObservedProperty by the given id
-func (gdb *GostDatabase) DeleteObservedProperty(id interface{}) error {
+func (gdb *GostDatabase) DeleteObservedProperty(id any) error {
 	return DeleteEntity(gdb, id, "observedproperty")
 }

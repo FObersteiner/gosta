@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/gost/server/sensorthings/models"
-	"github.com/gost/server/sensorthings/rest/endpoint"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
+	"github.com/FObersteiner/gosta-server/sensorthings/rest/endpoint"
 )
 
 // CreateRouter creates a new mux.Router and sets up all endpoints defined in the SensorThings api

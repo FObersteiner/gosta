@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	godata "github.com/FObersteiner/gosta-odata"
 	"github.com/gorilla/mux"
-	"github.com/gost/godata"
 )
 
 // SupportedExpandParameters contains a list of endpoints with their supported expand parameters

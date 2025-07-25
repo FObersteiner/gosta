@@ -1,8 +1,8 @@
 package config
 
 import (
-	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/models"
+	entities "github.com/FObersteiner/gosta-core"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
 )
 
 // Endpoints contains the current set-up of the endpoints

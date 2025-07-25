@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"testing"
 
-	entities "github.com/gost/core"
-	"github.com/gost/server/configuration"
-	"github.com/gost/server/database/postgis"
-	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/mqtt"
-	"github.com/gost/server/sensorthings/odata"
+	"github.com/FObersteiner/gosta-server/configuration"
+	"github.com/FObersteiner/gosta-server/database/postgis"
+	gostErrors "github.com/FObersteiner/gosta-server/errors"
+	"github.com/FObersteiner/gosta-server/mqtt"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
+	entities "github.com/FObersteiner/gosta-core"
 
-	"github.com/gost/godata"
+	godata "github.com/FObersteiner/gosta-odata"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	entities "github.com/gost/core"
-	"github.com/gost/godata"
+	godata "github.com/FObersteiner/gosta-odata"
+	entities "github.com/FObersteiner/gosta-core"
 )
 
 var filterToStringMap map[int]func(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType, ignoreSelectAs bool) string

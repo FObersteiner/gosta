@@ -2,14 +2,15 @@ package odata
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/gost/godata"
-	"github.com/stretchr/testify/assert"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	godata "github.com/FObersteiner/gosta-odata"
+	"github.com/gorilla/mux"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestExpandParametersSupported(t *testing.T) {
@@ -174,6 +175,6 @@ func TestReadRefFromWildcard(t *testing.T) {
 	assert.NotEqual(t, resp, nil)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	body := resp.Body
-	result, _ := ioutil.ReadAll(body)
+	result, _ := io.ReadAll(body)
 	assert.Equal(t, string(result), "true")
 }

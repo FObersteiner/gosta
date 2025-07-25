@@ -3,10 +3,10 @@ package handlers
 import (
 	"net/http"
 
-	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/models"
-	"github.com/gost/server/sensorthings/odata"
-	"github.com/gost/server/sensorthings/rest/reader"
+	entities "github.com/FObersteiner/gosta-core"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
+	"github.com/FObersteiner/gosta-server/sensorthings/rest/reader"
 )
 
 // HandleGetLocations retrieves multiple locations based on query parameters

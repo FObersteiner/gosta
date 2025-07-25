@@ -1,7 +1,7 @@
 package api
 
 import (
-	entities "github.com/gost/core"
+	entities "github.com/FObersteiner/gosta-core"
 )
 
 // PostCreateObservations checks for correctness of the datastreams and observations and calls PostcreateObservations on the database

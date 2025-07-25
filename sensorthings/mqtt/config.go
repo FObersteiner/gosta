@@ -1,7 +1,7 @@
 package mqtt
 
 import (
-	"github.com/gost/server/sensorthings/models"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
 )
 
 // CreateTopics creates the pre-defined MQTT Topics

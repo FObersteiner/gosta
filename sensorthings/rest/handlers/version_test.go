@@ -13,12 +13,12 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	entities "github.com/gost/core"
-	"github.com/gost/server/configuration"
-	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/models"
-	"github.com/gost/server/sensorthings/odata"
-	"github.com/gost/server/sensorthings/rest/endpoint"
+	entities "github.com/FObersteiner/gosta-core"
+	"github.com/FObersteiner/gosta-server/configuration"
+	gostErrors "github.com/FObersteiner/gosta-server/errors"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
+	"github.com/FObersteiner/gosta-server/sensorthings/rest/endpoint"
 	"github.com/stretchr/testify/assert"
 )
 

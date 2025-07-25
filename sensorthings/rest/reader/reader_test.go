@@ -8,8 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	entities "github.com/gost/core"
-	gostErrors "github.com/gost/server/errors"
+	entities "github.com/FObersteiner/gosta-core"
+	gostErrors "github.com/FObersteiner/gosta-server/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/gorilla/mux"

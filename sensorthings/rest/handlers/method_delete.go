@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/gost/server/sensorthings/models"
-	"github.com/gost/server/sensorthings/rest/writer"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
+	"github.com/FObersteiner/gosta-server/sensorthings/rest/writer"
 )
 
 // handleDeleteRequest

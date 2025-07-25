@@ -3,8 +3,8 @@ package postgis
 import (
 	"testing"
 
-	entities "github.com/gost/core"
-	"github.com/gost/godata"
+	godata "github.com/FObersteiner/gosta-odata"
+	entities "github.com/FObersteiner/gosta-core"
 	"github.com/stretchr/testify/assert"
 )
 

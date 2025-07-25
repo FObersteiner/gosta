@@ -6,10 +6,10 @@ import (
 	"errors"
 	"fmt"
 
-	entities "github.com/gost/core"
-	"github.com/gost/now"
-	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/odata"
+	gostErrors "github.com/FObersteiner/gosta-server/errors"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
+	"github.com/FObersteiner/gosta-server/timetools"
+	entities "github.com/FObersteiner/gosta-core"
 )
 
 func datastreamParamFactory(values map[string]any) (entities.Entity, error) {
@@ -37,12 +37,12 @@ func datastreamParamFactory(values map[string]any) (entities.Entity, error) {
 		case asMappings[entities.EntityTypeDatastream][datastreamDescription]:
 			ds.Description = value.(string)
 		case asMappings[entities.EntityTypeDatastream][datastreamResultTime]:
-			ds.ResultTime = now.PostgresToIso8601Period(value.(string))
+			ds.ResultTime = timetools.PostgresToIso8601Period(value.(string))
 		case asMappings[entities.EntityTypeDatastream][datastreamObservationType]:
 			obs, _ := entities.GetObservationTypeByID(value.(int64))
 			ds.ObservationType = obs.Value
 		case asMappings[entities.EntityTypeDatastream][datastreamPhenomenonTime]:
-			ds.PhenomenonTime = now.PostgresToIso8601Period(value.(string))
+			ds.PhenomenonTime = timetools.PostgresToIso8601Period(value.(string))
 		case asMappings[entities.EntityTypeDatastream][datastreamUnitOfMeasurement]:
 			t := value.(string)
 
@@ -260,12 +260,12 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 
 	phenomenonTime := "NULL"
 	if len(d.PhenomenonTime) != 0 {
-		phenomenonTime = "'" + now.Iso8601ToPostgresPeriod(d.PhenomenonTime) + "'"
+		phenomenonTime = "'" + timetools.Iso8601ToPostgresPeriod(d.PhenomenonTime) + "'"
 	}
 
 	resultTime := "NULL"
 	if len(d.ResultTime) != 0 {
-		resultTime = "'" + now.Iso8601ToPostgresPeriod(d.ResultTime) + "'"
+		resultTime = "'" + timetools.Iso8601ToPostgresPeriod(d.ResultTime) + "'"
 	}
 	// get the ObservationType id in the lookup table
 	observationType, err := entities.GetObservationTypeByValue(d.ObservationType)
@@ -332,12 +332,12 @@ func (gdb *GostDatabase) PatchDatastream(id interface{}, ds *entities.Datastream
 	}
 
 	if len(ds.PhenomenonTime) > 0 {
-		phenomenonTime := now.Iso8601ToPostgresPeriod(ds.PhenomenonTime)
+		phenomenonTime := timetools.Iso8601ToPostgresPeriod(ds.PhenomenonTime)
 		updates["phenomenontime"] = phenomenonTime
 	}
 
 	if len(ds.ResultTime) > 0 {
-		resultTime := now.Iso8601ToPostgresPeriod(ds.ResultTime)
+		resultTime := timetools.Iso8601ToPostgresPeriod(ds.ResultTime)
 		updates["resulttime"] = resultTime
 	}
 

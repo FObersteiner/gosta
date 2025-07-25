@@ -8,13 +8,13 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/gost/server/configuration"
-	"github.com/gost/server/database/postgis"
-	"github.com/gost/server/http"
-	gostLog "github.com/gost/server/log"
-	"github.com/gost/server/mqtt"
-	"github.com/gost/server/sensorthings/api"
-	"github.com/gost/server/sensorthings/models"
+	"github.com/FObersteiner/gosta-server/configuration"
+	"github.com/FObersteiner/gosta-server/database/postgis"
+	"github.com/FObersteiner/gosta-server/http"
+	gostLog "github.com/FObersteiner/gosta-server/log"
+	"github.com/FObersteiner/gosta-server/mqtt"
+	"github.com/FObersteiner/gosta-server/sensorthings/api"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
 )
 
 var (

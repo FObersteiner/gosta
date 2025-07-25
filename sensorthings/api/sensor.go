@@ -3,10 +3,10 @@ package api
 import (
 	"errors"
 
-	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/odata"
+	entities "github.com/FObersteiner/gosta-core"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
 
-	gostErrors "github.com/gost/server/errors"
+	gostErrors "github.com/FObersteiner/gosta-server/errors"
 )
 
 // GetSensor retrieves a sensor by id and given query

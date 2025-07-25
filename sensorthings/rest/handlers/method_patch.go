@@ -3,10 +3,10 @@ package handlers
 import (
 	"net/http"
 
-	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/models"
-	"github.com/gost/server/sensorthings/rest/reader"
-	"github.com/gost/server/sensorthings/rest/writer"
+	entities "github.com/FObersteiner/gosta-core"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
+	"github.com/FObersteiner/gosta-server/sensorthings/rest/reader"
+	"github.com/FObersteiner/gosta-server/sensorthings/rest/writer"
 )
 
 // handlePatchRequest todo: currently almost same as handlePostRequest, merge if it stays like this

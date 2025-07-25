@@ -7,9 +7,9 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	paho "github.com/eclipse/paho.mqtt.golang"
-	"github.com/gost/server/configuration"
-	gostLog "github.com/gost/server/log"
-	"github.com/gost/server/sensorthings/models"
+	"github.com/FObersteiner/gosta-server/configuration"
+	gostLog "github.com/FObersteiner/gosta-server/log"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 )

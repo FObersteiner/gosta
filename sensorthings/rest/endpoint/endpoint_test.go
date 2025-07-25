@@ -4,8 +4,8 @@ import (
 	"sort"
 	"testing"
 
-	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/models"
+	entities "github.com/FObersteiner/gosta-core"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
 	"github.com/stretchr/testify/assert"
 )
 

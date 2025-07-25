@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gost/server/sensorthings/models"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
 	"github.com/stretchr/testify/assert"
 )
 

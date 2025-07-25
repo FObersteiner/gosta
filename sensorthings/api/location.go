@@ -6,9 +6,9 @@ import (
 	"log"
 	"time"
 
-	entities "github.com/gost/core"
-	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/odata"
+	entities "github.com/FObersteiner/gosta-core"
+	gostErrors "github.com/FObersteiner/gosta-server/errors"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
 )
 
 // PostLocation tries to add a new location

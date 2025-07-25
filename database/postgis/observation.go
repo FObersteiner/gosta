@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"strings"
 
-	entities "github.com/gost/core"
-	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/odata"
+	entities "github.com/FObersteiner/gosta-core"
+	gostErrors "github.com/FObersteiner/gosta-server/errors"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
 )
 
 func observationParamFactory(values map[string]interface{}) (entities.Entity, error) {

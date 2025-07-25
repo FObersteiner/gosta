@@ -6,13 +6,13 @@ import (
 	"net/url"
 	"strings"
 
-	entities "github.com/gost/core"
-	"github.com/gost/server/configuration"
-	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/models"
-	"github.com/gost/server/sensorthings/mqtt"
-	"github.com/gost/server/sensorthings/odata"
-	"github.com/gost/server/sensorthings/rest/config"
+	entities "github.com/FObersteiner/gosta-core"
+	"github.com/FObersteiner/gosta-server/configuration"
+	gostErrors "github.com/FObersteiner/gosta-server/errors"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
+	"github.com/FObersteiner/gosta-server/sensorthings/mqtt"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
+	"github.com/FObersteiner/gosta-server/sensorthings/rest/config"
 )
 
 // APIv1 is the default implementation of SensorThingsApi, API needs a database

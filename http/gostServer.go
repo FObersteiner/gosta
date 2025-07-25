@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	odata "github.com/gost/server/sensorthings/odata"
+	odata "github.com/FObersteiner/gosta-server/sensorthings/odata"
 
-	gostLog "github.com/gost/server/log"
-	"github.com/gost/server/sensorthings/models"
+	gostLog "github.com/FObersteiner/gosta-server/log"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
 	log "github.com/sirupsen/logrus"
 )
 

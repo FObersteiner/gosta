@@ -3,10 +3,10 @@ package config
 import (
 	"fmt"
 
-	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/models"
-	"github.com/gost/server/sensorthings/rest/endpoint"
-	"github.com/gost/server/sensorthings/rest/handlers"
+	entities "github.com/FObersteiner/gosta-core"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
+	"github.com/FObersteiner/gosta-server/sensorthings/rest/endpoint"
+	"github.com/FObersteiner/gosta-server/sensorthings/rest/handlers"
 )
 
 // CreateObservationsEndpoint constructs the Observations endpoint configuration

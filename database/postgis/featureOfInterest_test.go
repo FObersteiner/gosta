@@ -1,7 +1,7 @@
 package postgis
 
 import (
-	entities "github.com/gost/core"
+	entities "github.com/FObersteiner/gosta-core"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

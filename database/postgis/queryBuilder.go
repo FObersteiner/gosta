@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	entities "github.com/gost/core"
-	"github.com/gost/godata"
-	gostLog "github.com/gost/server/log"
-	"github.com/gost/server/sensorthings/odata"
+	godata "github.com/FObersteiner/gosta-odata"
+	gostLog "github.com/FObersteiner/gosta-server/log"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
+	entities "github.com/FObersteiner/gosta-core"
 	log "github.com/sirupsen/logrus"
 )
 

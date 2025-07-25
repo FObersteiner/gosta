@@ -3,9 +3,9 @@ package models
 import (
 	"net/http"
 
-	entities "github.com/gost/core"
-	"github.com/gost/server/configuration"
-	"github.com/gost/server/sensorthings/odata"
+	entities "github.com/FObersteiner/gosta-core"
+	"github.com/FObersteiner/gosta-server/configuration"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
 )
 
 const (

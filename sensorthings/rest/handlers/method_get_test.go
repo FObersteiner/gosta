@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/odata"
+	entities "github.com/FObersteiner/gosta-core"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
 	"github.com/stretchr/testify/assert"
 )
 

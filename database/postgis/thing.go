@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 
-	entities "github.com/gost/core"
+	entities "github.com/FObersteiner/gosta-core"
 
 	"database/sql"
 	"errors"
 
-	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/odata"
+	gostErrors "github.com/FObersteiner/gosta-server/errors"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
 )
 
 func thingParamFactory(values map[string]interface{}) (entities.Entity, error) {

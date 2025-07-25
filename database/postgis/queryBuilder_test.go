@@ -4,9 +4,9 @@ import (
 	"net/url"
 	"testing"
 
-	entities "github.com/gost/core"
-	"github.com/gost/godata"
-	"github.com/gost/server/sensorthings/odata"
+	godata "github.com/FObersteiner/gosta-odata"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
+	entities "github.com/FObersteiner/gosta-core"
 	"github.com/stretchr/testify/assert"
 )
 

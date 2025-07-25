@@ -2,18 +2,17 @@ package postgis
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
-
-	"encoding/json"
+	"os"
 	"strconv"
 	"strings"
 
-	"github.com/gost/godata"
-	gostErrors "github.com/gost/server/errors"
-	gostLog "github.com/gost/server/log"
-	"github.com/gost/server/sensorthings/models"
+	godata "github.com/FObersteiner/gosta-odata"
+	gostErrors "github.com/FObersteiner/gosta-server/errors"
+	gostLog "github.com/FObersteiner/gosta-server/log"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
 	_ "github.com/lib/pq" // postgres driver
 	log "github.com/sirupsen/logrus"
 )
@@ -110,7 +109,7 @@ func (gdb *GostDatabase) CreateSchema(location string) error {
 
 // GetCreateDatabaseQuery returns the database creation script for PostgreSQL
 func GetCreateDatabaseQuery(location string, schema string) (*string, error) {
-	bytes, err := ioutil.ReadFile(location)
+	bytes, err := os.ReadFile(location)
 	if err != nil {
 		return nil, err
 	}

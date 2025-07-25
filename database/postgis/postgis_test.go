@@ -3,7 +3,7 @@ package postgis
 import (
 	"testing"
 
-	"github.com/gost/godata"
+	godata "github.com/FObersteiner/gosta-odata"
 	"github.com/stretchr/testify/assert"
 )
 

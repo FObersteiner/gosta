@@ -4,8 +4,8 @@ import (
 	"sort"
 	"strings"
 
-	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/models"
+	entities "github.com/FObersteiner/gosta-core"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
 )
 
 // Endpoint contains all information for creating and handling a main SensorThings endpoint.

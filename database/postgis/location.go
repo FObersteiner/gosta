@@ -1,17 +1,16 @@
 package postgis
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 
-	entities "github.com/gost/core"
+	entities "github.com/FObersteiner/gosta-core"
 
-	"database/sql"
-	"errors"
-
-	"github.com/gost/godata"
-	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/odata"
+	godata "github.com/FObersteiner/gosta-odata"
+	gostErrors "github.com/FObersteiner/gosta-server/errors"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
 )
 
 func locationParamFactory(values map[string]interface{}) (entities.Entity, error) {

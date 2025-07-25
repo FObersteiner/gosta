@@ -13,6 +13,10 @@ Types of changes
 
 ## [Unreleased]
 
+### Changed
+
+- exclusively use forked repositories to gain full control over the set of libraries
+
 ## 2025-07-25, 0.5.1
 
 ### Changed

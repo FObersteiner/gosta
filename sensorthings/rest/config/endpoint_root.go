@@ -3,9 +3,9 @@ package config
 import (
 	"fmt"
 
-	"github.com/gost/server/sensorthings/models"
-	"github.com/gost/server/sensorthings/rest/endpoint"
-	"github.com/gost/server/sensorthings/rest/handlers"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
+	"github.com/FObersteiner/gosta-server/sensorthings/rest/endpoint"
+	"github.com/FObersteiner/gosta-server/sensorthings/rest/handlers"
 )
 
 // CreateRootEndpoint creates the Root endpoint configuration

@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"strings"
 
-	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/models"
-	"github.com/gost/server/sensorthings/odata"
+	gostErrors "github.com/FObersteiner/gosta-server/errors"
+	"github.com/FObersteiner/gosta-server/sensorthings/models"
+	"github.com/FObersteiner/gosta-server/sensorthings/odata"
 )
 
 // SendJSONResponse sends the desired message to the user

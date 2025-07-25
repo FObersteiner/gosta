@@ -3,11 +3,12 @@ package handlers
 import (
 	"bytes"
 	"errors"
-	entities "github.com/gost/core"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	entities "github.com/FObersteiner/gosta-core"
+	"github.com/stretchr/testify/assert"
 )
 
 func testHandler() (*entities.Thing, []error) {

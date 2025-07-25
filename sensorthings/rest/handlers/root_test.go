@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	entities "github.com/gost/core"
+	entities "github.com/FObersteiner/gosta-core"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"testing"

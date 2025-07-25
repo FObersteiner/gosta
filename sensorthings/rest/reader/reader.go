@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	entities "github.com/gost/core"
-	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/rest/writer"
+	entities "github.com/FObersteiner/gosta-core"
+	gostErrors "github.com/FObersteiner/gosta-server/errors"
+	"github.com/FObersteiner/gosta-server/sensorthings/rest/writer"
 )
 
 // GetEntityID retrieves the id from the request, for example
