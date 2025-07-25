@@ -24,7 +24,7 @@ func setupLogger() {
 		log.Error(err)
 	}
 
-	//Setting default fields for main logger
+	// Setting default fields for main logger
 	logger = l.WithFields(log.Fields{"package": "gost.server.http"})
 }
 
@@ -49,8 +49,10 @@ type GostServer struct {
 // CreateServer initialises a new GOST HTTPServer based on the given parameters
 func CreateServer(host string, port int, api *models.API, https bool, httpsCert, httpsKey string) Server {
 	setupLogger()
+
 	a := *api
 	router := CreateRouter(api)
+
 	return &GostServer{
 		host:      host,
 		port:      port,
@@ -101,7 +103,6 @@ func RequestErrorHandler(h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.RawQuery
 		if query != "" {
-
 			if logger.Logger.Level == log.DebugLevel {
 				logger.Info("query given:" + query)
 			}
@@ -112,11 +113,14 @@ func RequestErrorHandler(h http.Handler) http.Handler {
 				w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 				w.WriteHeader(http.StatusBadRequest)
 				w.Write([]byte("Error: Not a valid Odata query given"))
+
 				return
 			}
 		}
+
 		h.ServeHTTP(w, r)
 	}
+
 	return http.HandlerFunc(fn)
 }
 
@@ -163,7 +167,6 @@ func LowerCaseURI(h http.Handler) http.Handler {
 // write to response. Is this a right approach?
 func PostProcessHandler(h http.Handler, externalURI string) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-
 		if logger.Logger.Level == log.DebugLevel {
 			logger.Debugf("%s start: %s", r.Method, r.URL.Path)
 			defer gostLog.DebugfWithElapsedTime(logger, time.Now(), "%s done: %s", r.Method, r.URL.Path)
@@ -179,15 +182,15 @@ func PostProcessHandler(h http.Handler, externalURI string) http.Handler {
 
 		// read response body and replace links
 		bytes := rec.Body.Bytes()
+
 		s := string(bytes)
 		if len(s) > 0 {
 			if len(forwardedURI) > 0 {
 				// if both are changed (X-Forwarded-For and External uri environment variabele) use the last one
 				if origURI == "http://localhost:8080/" {
-					s = strings.Replace(s, "localhost", forwardedURI, -1)
+					s = strings.ReplaceAll(s, "localhost", forwardedURI)
 				}
 			}
-
 		}
 		// handle headers too...
 		for k, v := range rec.HeaderMap {
@@ -199,7 +202,7 @@ func PostProcessHandler(h http.Handler, externalURI string) http.Handler {
 				if origURI == "http://localhost:8080/" {
 					logger.Debugf("proxy + location header detected. forwarded uri: %s", forwardedURI)
 					// idea: run net.LookupAddr(forwardeduri) to get hostname instead of ip address?
-					val = strings.Replace(val, "localhost", forwardedURI, -1)
+					val = strings.ReplaceAll(val, "localhost", forwardedURI)
 				}
 			}
 
@@ -213,5 +216,6 @@ func PostProcessHandler(h http.Handler, externalURI string) http.Handler {
 		// write modified response
 		w.Write([]byte(s))
 	}
+
 	return http.HandlerFunc(fn)
 }

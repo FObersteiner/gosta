@@ -17,6 +17,7 @@ func (a *APIv1) GetSensor(id interface{}, qo *odata.QueryOptions, path string) (
 	}
 
 	a.SetLinks(s, qo)
+
 	return s, nil
 }
 
@@ -28,6 +29,7 @@ func (a *APIv1) GetSensorByDatastream(id interface{}, qo *odata.QueryOptions, pa
 	}
 
 	a.SetLinks(s, qo)
+
 	return s, nil
 }
 
@@ -45,6 +47,7 @@ func (a *APIv1) GetSensors(qo *odata.QueryOptions, path string) (*entities.Array
 	}
 
 	var data interface{} = sensors
+
 	return a.createArrayResponse(count, hasNext, path, qo, data), nil
 }
 
@@ -57,6 +60,7 @@ func (a *APIv1) PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error) 
 
 	if (sensor.EncodingType != entities.EncodingPDF.Value) && (sensor.EncodingType != entities.EncodingSensorML.Value) {
 		err := errors.New("Encoding not supported. Supported encoding: " + entities.EncodingPDF.Value + ", " + entities.EncodingSensorML.Value)
+
 		return nil, []error{err}
 	}
 
@@ -79,6 +83,7 @@ func (a *APIv1) PatchSensor(id interface{}, sensor *entities.Sensor) (*entities.
 	if len(sensor.EncodingType) != 0 {
 		if (sensor.EncodingType != entities.EncodingPDF.Value) && (sensor.EncodingType != entities.EncodingSensorML.Value) {
 			err := errors.New("Encoding not supported. Supported encoding: " + entities.EncodingPDF.Value + ", " + entities.EncodingSensorML.Value)
+
 			return nil, err
 		}
 	}
@@ -89,12 +94,14 @@ func (a *APIv1) PatchSensor(id interface{}, sensor *entities.Sensor) (*entities.
 // PutSensor updates the given thing in the database
 func (a *APIv1) PutSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, []error) {
 	var err error
+
 	putsensor, err := a.db.PutSensor(id, sensor)
 	if err != nil {
 		return nil, []error{err}
 	}
 
 	putsensor.SetAllLinks(a.config.GetExternalServerURI())
+
 	return putsensor, nil
 }
 

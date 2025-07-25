@@ -77,7 +77,7 @@ func parseAndAssertHistoricalLocation(created entities.HistoricalLocation, r *ht
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &historicalLocation)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assertStatusCode(expectedStatusCode, r, t)
 	assertHistoricalLocation(created, historicalLocation, t)
 }
@@ -95,7 +95,7 @@ func getAndAssertHistoricalLocations(url string, t *testing.T) {
 	err = json.Unmarshal(body, &ar)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assertStatusCode(http.StatusOK, r, t)
 	assert.Equal(t, 2, ar.Count)
 

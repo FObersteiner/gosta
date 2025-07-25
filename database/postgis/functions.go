@@ -59,44 +59,53 @@ func init() {
 func getLeftAndRightFilter(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType, ignoreLeftSelectAs, ignoreRightSelectAs bool) (string, string) {
 	left := qb.createFilter(et, pn.Children[0], ignoreLeftSelectAs)
 	right := qb.createFilter(et, pn.Children[1], ignoreRightSelectAs)
+
 	return left, right
 }
 
 func containsToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left, right := getLeftAndRightFilter(qb, pn, et, true, true)
+
 	return fmt.Sprintf("%s LIKE %s", qb.createLike(left, LikeContains), qb.createLike(right, LikeContains))
 }
 
 func substringofToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left, right := getLeftAndRightFilter(qb, pn, et, true, true)
+
 	return fmt.Sprintf("%s LIKE %s", qb.createLike(right, LikeContains), qb.createLike(left, LikeContains))
 }
 
 func endswithToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left, right := getLeftAndRightFilter(qb, pn, et, true, true)
+
 	return fmt.Sprintf("%s LIKE %s", qb.createLike(left, LikeEndsWith), qb.createLike(right, LikeEndsWith))
 }
 
 func startswithToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left, right := getLeftAndRightFilter(qb, pn, et, true, true)
+
 	return fmt.Sprintf("%s LIKE %s", qb.createLike(left, LikeStartsWith), qb.createLike(right, LikeStartsWith))
 }
 
 func lengthToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left := qb.createFilter(et, pn.Children[0], true)
+
 	return fmt.Sprintf("LENGTH(%s)", left)
 }
 
 func indexofToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left, right := getLeftAndRightFilter(qb, pn, et, true, true)
+
 	return fmt.Sprintf("STRPOS(%s, %s) -1", left, right)
 }
 
 func substringToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left, right := getLeftAndRightFilter(qb, pn, et, true, true)
+
 	right2 := ""
 	if len(pn.Children) > 2 {
 		right2 = qb.createFilter(et, pn.Children[2], true)
+
 		return fmt.Sprintf("SUBSTRING(%s from (%s + 1) for %s)", left, right, right2)
 	}
 
@@ -105,37 +114,44 @@ func substringToString(qb QueryBuilder, pn *godata.ParseNode, et entities.Entity
 
 func tolowerToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left := qb.createFilter(et, pn.Children[0], true)
+
 	return fmt.Sprintf("LOWER(%s)", left)
 }
 
 func toupperToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left := qb.createFilter(et, pn.Children[0], true)
+
 	return fmt.Sprintf("UPPER(%s)", left)
 }
 
 func trimToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left := qb.createFilter(et, pn.Children[0], true)
+
 	return fmt.Sprintf("TRIM(both ' ' from %s)", left)
 }
 
 func concatToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left, right := getLeftAndRightFilter(qb, pn, et, true, true)
+
 	return fmt.Sprintf("CONCAT(%s, %s)", left, right)
 }
 
 func roundToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left := qb.createFilter(et, pn.Children[0], true)
-	return fmt.Sprintf("ROUND(CAST(%s as double precision))", strings.Replace(left, "->", "->>", -1))
+
+	return fmt.Sprintf("ROUND(CAST(%s as double precision))", strings.ReplaceAll(left, "->", "->>"))
 }
 
 func floorToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left := qb.createFilter(et, pn.Children[0], true)
-	return fmt.Sprintf("FLOOR(CAST(%s as double precision))", strings.Replace(left, "->", "->>", -1))
+
+	return fmt.Sprintf("FLOOR(CAST(%s as double precision))", strings.ReplaceAll(left, "->", "->>"))
 }
 
 func ceilingToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left := qb.createFilter(et, pn.Children[0], true)
-	return fmt.Sprintf("CEILING(CAST(%s as double precision))", strings.Replace(left, "->", "->>", -1))
+
+	return fmt.Sprintf("CEILING(CAST(%s as double precision))", strings.ReplaceAll(left, "->", "->>"))
 }
 
 func yearToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
@@ -164,11 +180,13 @@ func secondToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityTyp
 
 func fractionalsecondsToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left := qb.createFilter(et, pn.Children[0], true)
+
 	return fmt.Sprintf("EXTRACT(MICROSECONDS FROM to_timestamp(%s,'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')) / 1000000", left)
 }
 
 func dateToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left := qb.createFilter(et, pn.Children[0], true)
+
 	return fmt.Sprintf("(%s)::date", left)
 }
 
@@ -183,23 +201,25 @@ func timeToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType)
 
 func totaloffsetminutesToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left := qb.createFilter(et, pn.Children[0], true)
+
 	return fmt.Sprintf("EXTRACT(TIMEZONE_MINUTE FROM to_timestamp(%s,'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"'))", left)
 }
 
 func nowToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
-	return fmt.Sprint("to_char(now()::timestamp at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')")
+	return "to_char(now()::timestamp at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')"
 }
 
 func maxdatetimeToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
-	return fmt.Sprint("'9999-12-31T23:59:59.999Z'")
+	return "'9999-12-31T23:59:59.999Z'"
 }
 
 func mindatetimeToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
-	return fmt.Sprint("'0001-01-01T00:00:00.000Z'")
+	return "'0001-01-01T00:00:00.000Z'"
 }
 
 func totalsecondsToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
 	left := qb.createFilter(et, pn.Children[0], true)
+
 	return fmt.Sprintf("SELECT extract(epoch from (%s)::timestamp)", left)
 }
 

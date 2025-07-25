@@ -23,15 +23,19 @@ func handlePutRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request
 	err := reader.ParseEntity(entity, byteData)
 	if err != nil {
 		writer.SendError(w, []error{err}, indentJSON)
+
 		return
 	}
 
 	handle := *h
+
 	data, err2 := handle()
 	if err2 != nil {
 		writer.SendError(w, err2, indentJSON)
+
 		return
 	}
+
 	selfLink := entity.GetSelfLink()
 	w.Header().Add("Location", selfLink)
 	writer.SendJSONResponse(w, http.StatusOK, data, nil, indentJSON)

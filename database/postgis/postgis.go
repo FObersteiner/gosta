@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	//TimeFormat describes the format in which we want our DateTime to display
+	// TimeFormat describes the format in which we want our DateTime to display
 	TimeFormat = "YYYY-MM-DD\"T\"HH24:MI:SS.MSZ"
 )
 
@@ -50,6 +50,7 @@ func setupLogger() {
 }
 
 // NewDatabase initialises the PostgreSQL database
+//
 //	host = TCP host:port or Unix socket depending on Network.
 //	user = database user
 //	password = database password
@@ -57,6 +58,7 @@ func setupLogger() {
 //	ssl = Whether to use secure TCP/IP connections (TLS).
 func NewDatabase(host string, port int, user string, password string, database string, schema string, ssl bool, maxIdeConns int, maxOpenConns int, maxTop int) models.Database {
 	setupLogger()
+
 	return &GostDatabase{
 		Host:         host,
 		Port:         port,
@@ -89,6 +91,7 @@ func (gdb *GostDatabase) Start() {
 	}
 
 	gdb.Db = db
+
 	logger.Infof("Connected to database")
 }
 
@@ -101,6 +104,7 @@ func (gdb *GostDatabase) CreateSchema(location string) error {
 
 	c := *create
 	_, err2 := gdb.Db.Exec(c)
+
 	return err2
 }
 
@@ -111,8 +115,9 @@ func GetCreateDatabaseQuery(location string, schema string) (*string, error) {
 		return nil, err
 	}
 
-	content := string(bytes[:])
+	content := string(bytes)
 	formatted := fmt.Sprintf(content, schema, schema, schema, schema)
+
 	return &formatted, nil
 }
 
@@ -120,18 +125,21 @@ func GetCreateDatabaseQuery(location string, schema string) (*string, error) {
 func ContainsToLower(s []*godata.SelectItem, e string) bool {
 	for _, a := range s {
 		for _, b := range a.Segments {
-			if strings.ToLower(b.Value) == strings.ToLower(e) {
+			if strings.EqualFold(b.Value, e) {
 				return true
 			}
 		}
 	}
+
 	return false
 }
 
 // EntityExists checks if entity exists in database
 func EntityExists(gdb *GostDatabase, id interface{}, entityName string) bool {
 	var result bool
+
 	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.%s WHERE id = $1 LIMIT 1)", gdb.Schema, entityName)
+
 	err := gdb.Db.QueryRow(sql, id).Scan(&result)
 	if err != nil {
 		return false
@@ -144,7 +152,8 @@ func EntityExists(gdb *GostDatabase, id interface{}, entityName string) bool {
 func DeleteEntity(gdb *GostDatabase, id interface{}, entityName string) error {
 	intID, ok := ToIntID(id)
 	if !ok {
-		errorMessage := fmt.Sprintf("%s does not exist", entityName)
+		errorMessage := entityName + " does not exist"
+
 		return gostErrors.NewRequestNotFound(errors.New(errorMessage))
 	}
 
@@ -154,9 +163,11 @@ func DeleteEntity(gdb *GostDatabase, id interface{}, entityName string) error {
 	}
 
 	if c, _ := r.RowsAffected(); c == 0 {
-		errorMessage := fmt.Sprintf("%s not found", entityName)
+		errorMessage := entityName + " not found"
+
 		return gostErrors.NewRequestNotFound(errors.New(errorMessage))
 	}
+
 	return nil
 }
 
@@ -183,6 +194,7 @@ func ToIntID(id interface{}) (int, bool) {
 		if err != nil {
 			return 0, false
 		}
+
 		return intID, true
 	case float64:
 		return int(t), true
@@ -205,6 +217,7 @@ func (gdb *GostDatabase) updateEntityColumns(table string, updates map[string]in
 
 	columns := ""
 	prefix := ""
+
 	for k, v := range updates {
 		switch t := v.(type) {
 		case string:
@@ -215,6 +228,7 @@ func (gdb *GostDatabase) updateEntityColumns(table string, updates map[string]in
 		}
 
 		columns += fmt.Sprintf("%s%s=%v", prefix, k, v)
+
 		if prefix != ", " {
 			prefix = ", "
 		}
@@ -222,5 +236,6 @@ func (gdb *GostDatabase) updateEntityColumns(table string, updates map[string]in
 
 	sql := fmt.Sprintf("update %s.%s set %s where id = $1", gdb.Schema, table, columns)
 	_, err := gdb.Db.Exec(sql, entityID)
+
 	return err
 }

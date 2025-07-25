@@ -25,7 +25,7 @@ import (
 func TestVersionResponse(t *testing.T) {
 	// act
 	r := request("GET", "/version", nil)
-	//HandleVersion()
+	// HandleVersion()
 	version := models.VersionInfo{}
 	body, _ := ioutil.ReadAll(r.Body)
 	json.Unmarshal(body, &version)
@@ -42,6 +42,7 @@ func assertStatusCode(expectedStatusCode int, r *http.Response, t *testing.T) {
 
 func request(method, url string, body interface{}) *http.Response {
 	var reader io.Reader
+
 	if body != nil {
 		b, _ := json.Marshal(body)
 		reader = bytes.NewReader(b)
@@ -64,7 +65,7 @@ func getRouter() *mux.Router {
 	for _, e := range eps {
 		op := e
 		operation := op.Operation
-		method := fmt.Sprintf("%s", operation.OperationType)
+		method := string(operation.OperationType)
 		router.Methods(method).
 			Path(operation.Path).
 			HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -87,12 +88,14 @@ func getServer() *httptest.Server {
 func newMockThing(id int) *entities.Thing {
 	thing := &entities.Thing{Name: fmt.Sprintf("thing %v", id), Description: fmt.Sprintf("description of thing %v", id), Properties: map[string]interface{}{"type": "none"}}
 	thing.ID = id
+
 	return thing
 }
 
 func newMockSensor(id int) *entities.Sensor {
 	sensor := &entities.Sensor{Name: fmt.Sprintf("sensor %v", id), Description: fmt.Sprintf("description of sensor %v", id), EncodingType: "PDF", Metadata: "none"}
 	sensor.ID = id
+
 	return sensor
 }
 
@@ -102,6 +105,7 @@ func newMockLocation(id int) *entities.Location {
 		EncodingType: "application/vnd.geo+json",
 		Location:     map[string]interface{}{"coordinates": "test"}}
 	location.ID = id
+
 	return location
 }
 
@@ -110,30 +114,35 @@ func newMockHistoricalLocation(id int) *entities.HistoricalLocation {
 		Time: "2017-07-17T07:03:09.194Z",
 	}
 	historicalLocation.ID = id
+
 	return historicalLocation
 }
 
 func newMockObservedProperty(id int) *entities.ObservedProperty {
 	op := &entities.ObservedProperty{Name: fmt.Sprintf("sensor %v", id), Description: fmt.Sprintf("description of sensor %v", id), Definition: "none"}
 	op.ID = id
+
 	return op
 }
 
 func newMockObservation(id int) *entities.Observation {
 	op := &entities.Observation{Result: json.RawMessage("35"), PhenomenonTime: "2017-07-17T07:03:09.194Z", ResultQuality: "high"}
 	op.ID = id
+
 	return op
 }
 
 func newMockFeatureOfInterest(id int) *entities.FeatureOfInterest {
 	foi := &entities.FeatureOfInterest{Name: fmt.Sprintf("foi %v", id), Description: fmt.Sprintf("description of foi %v", id), EncodingType: "application/vnd.geo+json"}
 	foi.ID = id
+
 	return foi
 }
 
 func newMockDatastream(id int) *entities.Datastream {
 	ds := &entities.Datastream{Name: fmt.Sprintf("datastream %v", id), Description: fmt.Sprintf("description of datastream %v", id)}
 	ds.ID = id
+
 	return ds
 }
 
@@ -144,6 +153,7 @@ type MockAPI struct {
 // NewAPI Initialise a new SensorThings API
 func newMockAPI() models.API {
 	api := MockAPI{}
+
 	return &api
 }
 
@@ -173,6 +183,7 @@ func (a *MockAPI) GetConfig() *configuration.Config {
 func (a *MockAPI) GetAcceptedPaths() []string { return []string{} }
 func (a *MockAPI) GetBasePathInfo() *entities.ArrayResponse {
 	bpi := []models.Endpoint{}
+
 	ep := *a.GetEndpoints()
 	for _, e := range ep {
 		if e.ShowOutputInfo() {
@@ -190,6 +201,7 @@ func (a *MockAPI) GetBasePathInfo() *entities.ArrayResponse {
 
 func (a *MockAPI) GetEndpoints() *map[entities.EntityType]models.Endpoint {
 	eps := createEndPoints("localhost")
+
 	return &eps
 }
 
@@ -221,6 +233,7 @@ func getMockThing(id interface{}) (*entities.Thing, error) {
 	if !ok || intID != 1 {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
+
 	return newMockThing(intID), nil
 }
 
@@ -229,6 +242,7 @@ func getMockLocation(id interface{}) (*entities.Location, error) {
 	if !ok || intID != 1 {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
+
 	return newMockLocation(intID), nil
 }
 
@@ -237,6 +251,7 @@ func getMockHistoricalLocation(id interface{}) (*entities.HistoricalLocation, er
 	if !ok || intID != 1 {
 		return nil, gostErrors.NewRequestNotFound(errors.New("HsitoricalLocation does not exist"))
 	}
+
 	return newMockHistoricalLocation(intID), nil
 }
 
@@ -245,6 +260,7 @@ func getMockFeatureOfInterest(id interface{}) (*entities.FeatureOfInterest, erro
 	if !ok || intID != 1 {
 		return nil, gostErrors.NewRequestNotFound(errors.New("featureOfInterest does not exist"))
 	}
+
 	return newMockFeatureOfInterest(intID), nil
 }
 
@@ -253,6 +269,7 @@ func getMockSensor(id interface{}) (*entities.Sensor, error) {
 	if !ok || intID != 1 {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Sensor does not exist"))
 	}
+
 	return newMockSensor(intID), nil
 }
 
@@ -261,6 +278,7 @@ func getMockDatastream(id interface{}) (*entities.Datastream, error) {
 	if !ok || intID != 1 {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
+
 	return newMockDatastream(intID), nil
 }
 
@@ -269,6 +287,7 @@ func getMockObservedProperty(id interface{}) (*entities.ObservedProperty, error)
 	if !ok || intID != 1 {
 		return nil, gostErrors.NewRequestNotFound(errors.New("ObservedProperty does not exist"))
 	}
+
 	return newMockObservedProperty(intID), nil
 }
 
@@ -277,11 +296,13 @@ func getMockObservation(id interface{}) (*entities.Observation, error) {
 	if !ok || intID != 1 {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Observation does not exist"))
 	}
+
 	return newMockObservation(intID), nil
 }
 
 func getMockThings() (*entities.ArrayResponse, error) {
 	var data interface{} = []*entities.Thing{newMockThing(1), newMockThing(2)}
+
 	return &entities.ArrayResponse{
 		Count: 2,
 		Data:  &data,
@@ -290,6 +311,7 @@ func getMockThings() (*entities.ArrayResponse, error) {
 
 func getMockLocations() (*entities.ArrayResponse, error) {
 	var data interface{} = []*entities.Location{newMockLocation(1), newMockLocation(2)}
+
 	return &entities.ArrayResponse{
 		Count: 2,
 		Data:  &data,
@@ -298,6 +320,7 @@ func getMockLocations() (*entities.ArrayResponse, error) {
 
 func getMockHistoricalLocations() (*entities.ArrayResponse, error) {
 	var data interface{} = []*entities.HistoricalLocation{newMockHistoricalLocation(1), newMockHistoricalLocation(2)}
+
 	return &entities.ArrayResponse{
 		Count: 2,
 		Data:  &data,
@@ -306,6 +329,7 @@ func getMockHistoricalLocations() (*entities.ArrayResponse, error) {
 
 func getMockfeaturesOfInterest() (*entities.ArrayResponse, error) {
 	var data interface{} = []*entities.FeatureOfInterest{newMockFeatureOfInterest(1), newMockFeatureOfInterest(2)}
+
 	return &entities.ArrayResponse{
 		Count: 2,
 		Data:  &data,
@@ -314,6 +338,7 @@ func getMockfeaturesOfInterest() (*entities.ArrayResponse, error) {
 
 func getMockSensors() (*entities.ArrayResponse, error) {
 	var data interface{} = []*entities.Sensor{newMockSensor(1), newMockSensor(2)}
+
 	return &entities.ArrayResponse{
 		Count: 2,
 		Data:  &data,
@@ -322,6 +347,7 @@ func getMockSensors() (*entities.ArrayResponse, error) {
 
 func getMockObservedProperties() (*entities.ArrayResponse, error) {
 	var data interface{} = []*entities.ObservedProperty{newMockObservedProperty(1), newMockObservedProperty(2)}
+
 	return &entities.ArrayResponse{
 		Count: 2,
 		Data:  &data,
@@ -330,6 +356,7 @@ func getMockObservedProperties() (*entities.ArrayResponse, error) {
 
 func getMockObservations() (*entities.ArrayResponse, error) {
 	var data interface{} = []*entities.Observation{newMockObservation(1), newMockObservation(2)}
+
 	return &entities.ArrayResponse{
 		Count: 2,
 		Data:  &data,
@@ -338,6 +365,7 @@ func getMockObservations() (*entities.ArrayResponse, error) {
 
 func getMockDatastreams() (*entities.ArrayResponse, error) {
 	var data interface{} = []*entities.Datastream{newMockDatastream(1), newMockDatastream(2)}
+
 	return &entities.ArrayResponse{
 		Count: 2,
 		Data:  &data,
@@ -534,6 +562,7 @@ func (a *MockAPI) GetVersionInfo() *models.VersionInfo {
 
 func (a *MockAPI) PostCreateObservations(data *entities.CreateObservations) ([]string, []error) {
 	resp := make([]string, 0)
+
 	return resp, nil
 }
 
@@ -545,6 +574,7 @@ func toIntID(id interface{}) (int, bool) {
 		if err != nil {
 			return 0, false
 		}
+
 		return intID, true
 	case float64:
 		return int(t), true

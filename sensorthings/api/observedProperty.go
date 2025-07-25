@@ -16,6 +16,7 @@ func (a *APIv1) GetObservedProperty(id interface{}, qo *odata.QueryOptions, path
 	}
 
 	a.SetLinks(op, qo)
+
 	return op, nil
 }
 
@@ -27,6 +28,7 @@ func (a *APIv1) GetObservedPropertyByDatastream(datastreamID interface{}, qo *od
 	}
 
 	a.SetLinks(op, qo)
+
 	return op, nil
 }
 
@@ -44,6 +46,7 @@ func (a *APIv1) GetObservedProperties(qo *odata.QueryOptions, path string) (*ent
 	}
 
 	var data interface{} = ops
+
 	return a.createArrayResponse(count, hasNext, path, qo, data), nil
 }
 

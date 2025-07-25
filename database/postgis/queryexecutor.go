@@ -22,6 +22,7 @@ func ExecuteSelectCount(db *sql.DB, sql string) (int, error) {
 	}
 
 	var count int
+
 	db.QueryRow(sql).Scan(&count)
 
 	return count, nil
@@ -30,6 +31,7 @@ func ExecuteSelectCount(db *sql.DB, sql string) (int, error) {
 // ExecuteSelect executes the select query and creates the retrieved entities
 func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string, qo *odata.QueryOptions) ([]entities.Entity, bool, error) {
 	hasNextPage := false
+
 	if logger.Logger.Level == log.DebugLevel {
 		defer gostLog.DebugfWithElapsedTime(logger, time.Now(), "execute select query: %s", sql)
 	}
@@ -55,6 +57,7 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string, qo *odata.QueryOpt
 	// returned than requested and remove the extra entity
 	if qo != nil && qo.Top != nil && len(parentEntities) > int(*qo.Top) {
 		hasNextPage = true
+
 		parentEntities = append(parentEntities[:int(*qo.Top)])
 	}
 
@@ -82,10 +85,12 @@ func resultToEntities(rows *sql.Rows, q *QueryParseInfo, qo *odata.QueryOptions)
 			data := sortEntities[k]
 			// filter out already parsed and nil entities
 			skip := false
+
 			for col, val := range data {
 				if strings.HasSuffix(col, idAsSuffix) {
 					if val == nil {
 						skip = true
+
 						break
 					} else {
 						currentQIDEntityID[qi] = val
@@ -95,6 +100,7 @@ func resultToEntities(rows *sql.Rows, q *QueryParseInfo, qo *odata.QueryOptions)
 						for _, e := range parentEntities {
 							if e.GetID() == val {
 								skip = true
+
 								break
 							}
 						}
@@ -145,11 +151,13 @@ func setMaps(subEntities map[int]map[int]map[interface{}][]entities.Entity, pars
 		subEntities[qi] = make(map[int]map[interface{}][]entities.Entity)
 		parsedMap[qi] = make(map[int]map[interface{}]map[interface{}]interface{})
 	}
+
 	_, ok = subEntities[qi][relationMap[qi]]
 	if !ok {
 		subEntities[qi][relationMap[qi]] = make(map[interface{}][]entities.Entity)
 		parsedMap[qi][relationMap[qi]] = make(map[interface{}]map[interface{}]interface{})
 	}
+
 	_, ok = subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]]
 	if !ok {
 		subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]] = make([]entities.Entity, 0)
@@ -173,6 +181,7 @@ func prepareParseRow(columns []string, rows *sql.Rows, values []interface{}, ran
 	for k := range sortEntities {
 		keys = append(keys, k)
 	}
+
 	sort.Ints(keys)
 
 	return keys, sortEntities
@@ -195,6 +204,7 @@ func prepareExecuteSelect(columns []string, q *QueryParseInfo) (map[int]*QueryPa
 
 			// construct deleteIDMap
 			deleteIDMap[qpi.QueryIndex] = false
+
 			if qpi.ExpandItem != nil && qpi.ExpandItem.Select != nil {
 				found := false
 
@@ -203,9 +213,11 @@ func prepareExecuteSelect(columns []string, q *QueryParseInfo) (map[int]*QueryPa
 						found = true
 					}
 				}
+
 				deleteIDMap[qpi.QueryIndex] = !found
 			}
 		}
+
 		ranges[i] = qpi
 
 		slashIndex := strings.Index(c, "_")
@@ -220,6 +232,7 @@ func rowToEntities(columns []string, values []interface{}, ranges map[int]*Query
 
 	for i := range columns {
 		var v interface{}
+
 		val := values[i]
 		b, ok := val.([]byte)
 
@@ -279,6 +292,7 @@ func parseResults(entity entities.Entity, from int, relationMap map[int]int, sub
 			relatedEntityMap, ok := subEntities[subQI][from][entity.GetID()]
 			if ok {
 				addRelationToEntity(entity, relatedEntityMap)
+
 				for _, relatedEntity := range relatedEntityMap {
 					parseResults(relatedEntity, subQI, relationMap, subEntities, removeIDMap)
 				}

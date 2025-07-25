@@ -12,23 +12,25 @@ import (
 
 func sensorParamFactory(values map[string]interface{}) (entities.Entity, error) {
 	s := &entities.Sensor{}
+
 	for as, value := range values {
 		if value == nil {
 			continue
 		}
 
-		if as == asMappings[entities.EntityTypeSensor][sensorID] {
+		switch as {
+		case asMappings[entities.EntityTypeSensor][sensorID]:
 			s.ID = value
-		} else if as == asMappings[entities.EntityTypeSensor][sensorName] {
+		case asMappings[entities.EntityTypeSensor][sensorName]:
 			s.Name = value.(string)
-		} else if as == asMappings[entities.EntityTypeSensor][sensorDescription] {
+		case asMappings[entities.EntityTypeSensor][sensorDescription]:
 			s.Description = value.(string)
-		} else if as == asMappings[entities.EntityTypeSensor][sensorEncodingType] {
+		case asMappings[entities.EntityTypeSensor][sensorEncodingType]:
 			encodingType := value.(int64)
 			if encodingType != 0 {
 				s.EncodingType = entities.EncodingValues[encodingType].Value
 			}
-		} else if as == asMappings[entities.EntityTypeSensor][sensorMetadata] {
+		case asMappings[entities.EntityTypeSensor][sensorMetadata]:
 			s.Metadata = value.(string)
 		}
 	}
@@ -61,6 +63,7 @@ func (gdb *GostDatabase) GetSensorByDatastream(id interface{}, qo *odata.QueryOp
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Sensor{}, &entities.Datastream{}, intID, qo)
+
 	sensor, err := processSensor(gdb.Db, query, qi)
 	if err != nil {
 		return nil, err
@@ -73,6 +76,7 @@ func (gdb *GostDatabase) GetSensorByDatastream(id interface{}, qo *odata.QueryOp
 func (gdb *GostDatabase) GetSensors(qo *odata.QueryOptions) ([]*entities.Sensor, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Sensor{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Sensor{}, nil, nil, qo)
+
 	return processSensors(gdb.Db, query, qo, qi, countSQL)
 }
 
@@ -92,10 +96,11 @@ func processSensor(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Sensor
 func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string) ([]*entities.Sensor, int, bool, error) {
 	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
-		return nil, 0, hasNext, fmt.Errorf("Error executing query %v", err)
+		return nil, 0, hasNext, fmt.Errorf("Error executing query %w", err)
 	}
 
 	sensors := make([]*entities.Sensor, 0)
+
 	for _, d := range data {
 		entity := d.(*entities.Sensor)
 		sensors = append(sensors, entity)
@@ -105,7 +110,7 @@ func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryPar
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, hasNext, fmt.Errorf("Error executing count %v", err)
+			return nil, 0, hasNext, fmt.Errorf("Error executing count %w", err)
 		}
 	}
 
@@ -115,18 +120,21 @@ func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryPar
 // PostSensor posts a sensor to the database
 func (gdb *GostDatabase) PostSensor(sensor *entities.Sensor) (*entities.Sensor, error) {
 	var sensorID int
+
 	encoding, err1 := entities.CreateEncodingType(sensor.EncodingType)
 	if err1 != nil {
 		return nil, err1
 	}
 
 	sql2 := fmt.Sprintf("INSERT INTO %s.sensor (name, description, encodingtype, metadata) VALUES ($1, $2, $3, $4) RETURNING id", gdb.Schema)
+
 	err2 := gdb.Db.QueryRow(sql2, sensor.Name, sensor.Description, encoding.Code, sensor.Metadata).Scan(&sensorID)
 	if err2 != nil {
 		return nil, err2
 	}
 
 	sensor.ID = sensorID
+
 	return sensor, nil
 }
 
@@ -138,8 +146,11 @@ func (gdb *GostDatabase) SensorExists(id int) bool {
 // PatchSensor updates a sensor in the database
 func (gdb *GostDatabase) PatchSensor(id interface{}, s *entities.Sensor) (*entities.Sensor, error) {
 	var err error
+
 	var ok bool
+
 	var intID int
+
 	updates := make(map[string]interface{})
 
 	if intID, ok = ToIntID(id); !ok || !gdb.SensorExists(intID) {
@@ -168,6 +179,7 @@ func (gdb *GostDatabase) PatchSensor(id interface{}, s *entities.Sensor) (*entit
 	}
 
 	ns, _ := gdb.GetSensor(intID, nil)
+
 	return ns, nil
 }
 

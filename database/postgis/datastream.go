@@ -15,33 +15,38 @@ import (
 
 func datastreamParamFactory(values map[string]interface{}) (entities.Entity, error) {
 	ds := &entities.Datastream{}
+
 	for as, value := range values {
 		if value == nil {
 			continue
 		}
 
-		if as == asMappings[entities.EntityTypeDatastream][datastreamID] {
+		switch as {
+		case asMappings[entities.EntityTypeDatastream][datastreamID]:
 			ds.ID = value
-		} else if as == asMappings[entities.EntityTypeDatastream][datastreamObservedArea] {
+		case asMappings[entities.EntityTypeDatastream][datastreamObservedArea]:
 			t := value.(string)
+
 			observedAreaMap, err := JSONToMap(&t)
 			if err != nil {
 				return nil, err
 			}
+
 			ds.ObservedArea = observedAreaMap
-		} else if as == asMappings[entities.EntityTypeDatastream][datastreamName] {
+		case asMappings[entities.EntityTypeDatastream][datastreamName]:
 			ds.Name = value.(string)
-		} else if as == asMappings[entities.EntityTypeDatastream][datastreamDescription] {
+		case asMappings[entities.EntityTypeDatastream][datastreamDescription]:
 			ds.Description = value.(string)
-		} else if as == asMappings[entities.EntityTypeDatastream][datastreamResultTime] {
+		case asMappings[entities.EntityTypeDatastream][datastreamResultTime]:
 			ds.ResultTime = now.PostgresToIso8601Period(value.(string))
-		} else if as == asMappings[entities.EntityTypeDatastream][datastreamObservationType] {
+		case asMappings[entities.EntityTypeDatastream][datastreamObservationType]:
 			obs, _ := entities.GetObservationTypeByID(value.(int64))
 			ds.ObservationType = obs.Value
-		} else if as == asMappings[entities.EntityTypeDatastream][datastreamPhenomenonTime] {
+		case asMappings[entities.EntityTypeDatastream][datastreamPhenomenonTime]:
 			ds.PhenomenonTime = now.PostgresToIso8601Period(value.(string))
-		} else if as == asMappings[entities.EntityTypeDatastream][datastreamUnitOfMeasurement] {
+		case asMappings[entities.EntityTypeDatastream][datastreamUnitOfMeasurement]:
 			t := value.(string)
+
 			unitOfMeasurementMap, err := JSONToMap(&t)
 			if err != nil {
 				return nil, err
@@ -59,8 +64,11 @@ func (gdb *GostDatabase) GetObservedArea(id int) (map[string]interface{}, error)
 	sqlString := "select ST_AsGeoJSON(ST_ConvexHull(ST_Collect(feature))) as geom from %s.featureofinterest where id in (select distinct featureofinterest_id from %s.observation where stream_id=%v)"
 	sql2 := fmt.Sprintf(sqlString, gdb.Schema, gdb.Schema, id)
 	rows, err := gdb.Db.Query(sql2)
+
 	var geom string
+
 	var propMap map[string]interface{}
+
 	defer rows.Close()
 
 	if err != nil {
@@ -74,6 +82,7 @@ func (gdb *GostDatabase) GetObservedArea(id int) (map[string]interface{}, error)
 			propMap, _ = JSONToMap(&geom)
 		}
 	}
+
 	return propMap, err
 }
 
@@ -85,6 +94,7 @@ func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, nil, intID, qo)
+
 	datastream, err := processDatastream(gdb.Db, query, qi)
 	if err != nil {
 		return nil, err
@@ -92,7 +102,9 @@ func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (
 
 	if qo != nil {
 		hasSelectQuery := (qo.Select != nil)
+
 		var containsObservedArea = true
+
 		if hasSelectQuery {
 			containsObservedArea = ContainsToLower(qo.Select.SelectItems, "observedArea")
 		}
@@ -113,6 +125,7 @@ func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (
 func (gdb *GostDatabase) GetDatastreams(qo *odata.QueryOptions) ([]*entities.Datastream, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Datastream{}, nil, nil, qo)
+
 	return processDatastreams(gdb.Db, query, qo, qi, countSQL)
 }
 
@@ -124,6 +137,7 @@ func (gdb *GostDatabase) GetDatastreamByObservation(observationID interface{}, q
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, &entities.Observation{}, intID, qo)
+
 	return processDatastream(gdb.Db, query, qi)
 }
 
@@ -136,6 +150,7 @@ func (gdb *GostDatabase) GetDatastreamsByThing(thingID interface{}, qo *odata.Qu
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, &entities.Thing{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Datastream{}, &entities.Thing{}, intID, qo)
+
 	return processDatastreams(gdb.Db, query, qo, qi, countSQL)
 }
 
@@ -148,6 +163,7 @@ func (gdb *GostDatabase) GetDatastreamsBySensor(sensorID interface{}, qo *odata.
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, &entities.Sensor{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Datastream{}, &entities.Sensor{}, intID, qo)
+
 	return processDatastreams(gdb.Db, query, qo, qi, countSQL)
 }
 
@@ -160,6 +176,7 @@ func (gdb *GostDatabase) GetDatastreamsByObservedProperty(oID interface{}, qo *o
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, &entities.ObservedProperty{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Datastream{}, &entities.ObservedProperty{}, intID, qo)
+
 	return processDatastreams(gdb.Db, query, qo, qi, countSQL)
 }
 
@@ -179,10 +196,11 @@ func processDatastream(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Da
 func processDatastreams(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string) ([]*entities.Datastream, int, bool, error) {
 	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
-		return nil, 0, false, fmt.Errorf("Error executing query %v", err)
+		return nil, 0, false, fmt.Errorf("Error executing query %w", err)
 	}
 
 	datastreams := make([]*entities.Datastream, 0)
+
 	for _, d := range data {
 		entity := d.(*entities.Datastream)
 		datastreams = append(datastreams, entity)
@@ -192,7 +210,7 @@ func processDatastreams(db *sql.DB, sql string, qo *odata.QueryOptions, qi *Quer
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, false, fmt.Errorf("Error executing count %v", err)
+			return nil, 0, false, fmt.Errorf("Error executing count %w", err)
 		}
 	}
 
@@ -202,6 +220,7 @@ func processDatastreams(db *sql.DB, sql string, qo *odata.QueryOptions, qi *Quer
 // CheckDatastreamRelationsExist check if the related entities exist
 func CheckDatastreamRelationsExist(gdb *GostDatabase, d *entities.Datastream) error {
 	var tID, sID, oID int
+
 	var ok bool
 
 	if tID, ok = ToIntID(d.Thing.ID); !ok || !gdb.ThingExists(tID) {
@@ -215,6 +234,7 @@ func CheckDatastreamRelationsExist(gdb *GostDatabase, d *entities.Datastream) er
 	if oID, ok = ToIntID(d.ObservedProperty.ID); !ok || !gdb.ObservedPropertyExists(oID) {
 		return gostErrors.NewBadRequestError(errors.New("ObservedProperty does not exist"))
 	}
+
 	return nil
 }
 
@@ -224,16 +244,19 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 	if err != nil {
 		return nil, err
 	}
+
 	tID, _ := ToIntID(d.Thing.ID)
 	sID, _ := ToIntID(d.Sensor.ID)
 	oID, _ := ToIntID(d.ObservedProperty.ID)
+
 	var dsID int
 
 	unitOfMeasurement, _ := json.Marshal(d.UnitOfMeasurement)
 	geom := "NULL"
+
 	if len(d.ObservedArea) != 0 {
 		observedAreaBytes, _ := json.Marshal(d.ObservedArea)
-		geom = fmt.Sprintf("ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)", string(observedAreaBytes[:]))
+		geom = fmt.Sprintf("ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)", string(observedAreaBytes))
 	}
 
 	phenomenonTime := "NULL"
@@ -253,6 +276,7 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 	}
 
 	sql2 := fmt.Sprintf("INSERT INTO %s.datastream (name, description, unitofmeasurement, observedarea, thing_id, sensor_id, observedproperty_id, observationtype, phenomenonTime, resulttime) VALUES ($1, $2, $3, %s, $4, $5, $6, $7, %s, %s) RETURNING id", gdb.Schema, geom, phenomenonTime, resultTime)
+
 	err = gdb.Db.QueryRow(sql2, d.Name, d.Description, unitOfMeasurement, tID, sID, oID, observationType.Code).Scan(&dsID)
 	if err != nil {
 		return nil, err
@@ -271,8 +295,11 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 // PatchDatastream updates a Datastream in the database
 func (gdb *GostDatabase) PatchDatastream(id interface{}, ds *entities.Datastream) (*entities.Datastream, error) {
 	var err error
+
 	var ok bool
+
 	var intID int
+
 	updates := make(map[string]interface{})
 
 	if intID, ok = ToIntID(id); !ok || !gdb.DatastreamExists(intID) {
@@ -298,12 +325,12 @@ func (gdb *GostDatabase) PatchDatastream(id interface{}, ds *entities.Datastream
 
 	if len(ds.UnitOfMeasurement) > 0 {
 		j, _ := json.Marshal(ds.UnitOfMeasurement)
-		updates["unitofmeasurement"] = string(j[:])
+		updates["unitofmeasurement"] = string(j)
 	}
 
 	if len(ds.ObservedArea) > 0 {
 		observedAreaBytes, _ := json.Marshal(ds.ObservedArea)
-		updates["observedarea"] = fmt.Sprintf("ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)", string(observedAreaBytes[:]))
+		updates["observedarea"] = fmt.Sprintf("ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)", string(observedAreaBytes))
 	}
 
 	if len(ds.PhenomenonTime) > 0 {
@@ -321,6 +348,7 @@ func (gdb *GostDatabase) PatchDatastream(id interface{}, ds *entities.Datastream
 	}
 
 	nd, _ := gdb.GetDatastream(intID, nil)
+
 	return nd, nil
 }
 

@@ -1,16 +1,16 @@
 package api
 
 import (
+	"errors"
+	"fmt"
+	"testing"
+
 	entities "github.com/gost/core"
 	"github.com/gost/server/configuration"
 	"github.com/gost/server/database/postgis"
 	gostErrors "github.com/gost/server/errors"
 	"github.com/gost/server/mqtt"
 	"github.com/gost/server/sensorthings/odata"
-
-	"fmt"
-	"strings"
-	"testing"
 
 	"github.com/gost/godata"
 	"github.com/stretchr/testify/assert"
@@ -38,7 +38,7 @@ func TestCreateApi(t *testing.T) {
 	assert.NotNil(t, paths)
 	assert.NotNil(t, config)
 	assert.NotNil(t, ep)
-	assert.NotEqual(t, len(endpoints), 0, "Endpoints empty")
+	assert.NotEmpty(t, endpoints, "Endpoints empty")
 }
 
 func TestGetTopics(t *testing.T) {
@@ -54,7 +54,7 @@ func TestGetTopics(t *testing.T) {
 	// assert
 	assert.NotNil(t, topics)
 	firsttopic := (*topics)[0]
-	assert.True(t, firsttopic.Path == "GOST/#")
+	assert.Equal(t, firsttopic.Path, "GOST/#")
 }
 
 func TestAppendQueryPart(t *testing.T) {
@@ -63,9 +63,8 @@ func TestAppendQueryPart(t *testing.T) {
 	result1 := appendQueryPart("base?", "q")
 
 	// assert
-	assert.True(t, result == "base?q")
-	assert.True(t, result1 == "base?&q")
-
+	assert.Equal(t, result, "base?q")
+	assert.Equal(t, result1, "base?&q")
 }
 
 func TestSetLinks(t *testing.T) {
@@ -80,7 +79,7 @@ func TestSetLinks(t *testing.T) {
 	stAPI.SetLinks(&ds, nil)
 
 	// assert
-	assert.True(t, ds.GetSelfLink() == "/v1.0/Datastreams")
+	assert.Equal(t, ds.GetSelfLink(), "/v1.0/Datastreams")
 }
 
 func TestSetLinkWithQuery(t *testing.T) {
@@ -100,9 +99,8 @@ func TestSetLinkWithQuery(t *testing.T) {
 	stAPI.SetLinks(&ds, qo)
 
 	// assert
-	assert.True(t, ds.GetSelfLink() == "/v1.0/Datastreams")
-	assert.True(t, ds.ID == nil)
-
+	assert.Equal(t, ds.GetSelfLink(), "/v1.0/Datastreams")
+	assert.Equal(t, ds.ID, nil)
 }
 
 func TestCreateNextLink(t *testing.T) {
@@ -130,6 +128,7 @@ func TestCreateNextLink(t *testing.T) {
 	qt, _ = godata.ParseTopString("1")
 	qo.Top = qt
 	filterString := "name eq 'test'"
+
 	qf, err := godata.ParseFilterString(filterString)
 	if err != nil {
 		t.Errorf("Error parsing filter string: %v", err)
@@ -143,7 +142,7 @@ func TestCreateNextLink(t *testing.T) {
 	t.Logf("%v", result1)
 	// assert
 	assert.NotNil(t, result1)
-	assert.True(t, strings.Contains(result1, "name+eq+%27test%27"))
+	assert.Contains(t, result1, "name+eq+%27test%27")
 }
 
 func TestCreateArrayResponseWithCount(t *testing.T) {
@@ -210,10 +209,13 @@ func TestContainsMandatoryParamsReturningBadRequest(t *testing.T) {
 	assert.Equal(t, 400, getStatusCode(fErr))
 }
 
-func getStatusCode(error []error) int {
-	switch e := error[0].(type) {
-	case gostErrors.APIError:
-		return e.GetHTTPErrorStatusCode()
+func getStatusCode(errs []error) int {
+	{
+		var e gostErrors.APIError
+		switch {
+		case errors.As(errs[0], &e):
+			return e.GetHTTPErrorStatusCode()
+		}
 	}
 
 	return 0

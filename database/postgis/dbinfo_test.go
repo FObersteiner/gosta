@@ -10,14 +10,13 @@ import (
 
 func TestCreateTableMappings(t *testing.T) {
 	// arrange
-
 	// act
 	mappings := createTableMappings("v1")
 
 	// assert
 	assert.NotNil(t, mappings)
-	assert.True(t, len(mappings) > 0)
-	assert.True(t, mappings["Thing"] == "v1.thing")
+	assert.Positive(t, len(mappings))
+	assert.Equal(t, mappings["Thing"], "v1.thing")
 }
 
 func TestQueryParseInfoInit(t *testing.T) {
@@ -51,7 +50,6 @@ func TestGetQueryParseInfoByQueryIndex(t *testing.T) {
 	// assert
 	assert.NotNil(t, qpiReturn)
 	assert.NotNil(t, qpiReturn.QueryIndex == 0)
-
 }
 
 func TestGetQueryParseInfoByQueryIndexWithSubEntities(t *testing.T) {
@@ -65,7 +63,7 @@ func TestGetQueryParseInfoByQueryIndexWithSubEntities(t *testing.T) {
 	qpiReturn := qpi.GetQueryParseInfoByQueryIndex(1)
 
 	// assert
-	assert.True(t, qpiReturn.QueryIndex == 1)
+	assert.Equal(t, qpiReturn.QueryIndex, 1)
 }
 
 func TestGetQueryParseInfoByQueryIndexNotFound(t *testing.T) {
@@ -94,7 +92,7 @@ func TestGetNextQueryIndex(t *testing.T) {
 	result := qpi.GetNextQueryIndex()
 
 	// assert
-	assert.True(t, result == 2)
+	assert.Equal(t, result, 2)
 }
 
 func TestGetQueryIDRelationMap(t *testing.T) {
@@ -124,7 +122,7 @@ func TestGetQueryIDRelationMapWithSubEntities(t *testing.T) {
 
 	// assert
 	assert.NotNil(t, result)
-	assert.True(t, len(result) == 1)
+	assert.Equal(t, len(result), 1)
 }
 
 func TestQueryParseInfoParse(t *testing.T) {
@@ -138,7 +136,7 @@ func TestQueryParseInfoParse(t *testing.T) {
 	res, err := qpi.Parse(nil)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 }
 
@@ -149,8 +147,7 @@ func TestCreateWhereIs(t *testing.T) {
 
 	// assert
 	assert.NotNil(t, result)
-	assert.True(t, result == "prefix_")
-
+	assert.Equal(t, result, "prefix_")
 }
 
 func TestCreateWhereIsWithNoPrefix(t *testing.T) {
@@ -160,7 +157,7 @@ func TestCreateWhereIsWithNoPrefix(t *testing.T) {
 
 	// assert
 	assert.NotNil(t, result)
-	assert.True(t, result == "thing.id")
+	assert.Equal(t, result, "thing.id")
 }
 
 func TestGetJoinForThings(t *testing.T) {
@@ -174,9 +171,9 @@ func TestGetJoinForThings(t *testing.T) {
 
 	// assert
 	assert.NotNil(t, resultThingDatastream)
-	assert.True(t, resultThingDatastream == "WHERE thing.id = prefix_datastream.datastream_thing_id")
-	assert.True(t, resultThingHistoricalLocation == "WHERE thing.id = prefix_historicallocation.historicallocation_thing_id")
-	assert.True(t, resultThingLocation == "INNER JOIN  ON thing.id = thing_to_location.thing_id AND prefix_location.location_id = thing_to_location.location_id")
+	assert.Equal(t, resultThingDatastream, "WHERE thing.id = prefix_datastream.datastream_thing_id")
+	assert.Equal(t, resultThingHistoricalLocation, "WHERE thing.id = prefix_historicallocation.historicallocation_thing_id")
+	assert.Equal(t, resultThingLocation, "INNER JOIN  ON thing.id = thing_to_location.thing_id AND prefix_location.location_id = thing_to_location.location_id")
 }
 
 func TestGetJoinForLocation(t *testing.T) {
@@ -284,5 +281,5 @@ func TestGetJoinForUnknown(t *testing.T) {
 	resultUnknown := getJoin(tables, entities.EntityTypeUnknown, entities.EntityTypeObservation, "prefix")
 
 	// assert
-	assert.True(t, resultUnknown == "")
+	assert.Equal(t, resultUnknown, "")
 }

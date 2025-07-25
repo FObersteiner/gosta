@@ -15,7 +15,7 @@ type Endpoint struct {
 	Name                  string                     `json:"name"` // Name of the endpoint
 	URL                   string                     `json:"url"`  // External URL to the endpoint
 	EntityType            entities.EntityType        `json:"-"`
-	OutputInfo            bool                       `json:"-"` //Output when BasePathInfo is requested by the user
+	OutputInfo            bool                       `json:"-"` // Output when BasePathInfo is requested by the user
 	Operations            []models.EndpointOperation `json:"-"`
 	SupportedExpandParams []string                   `json:"-"`
 	SupportedSelectParams []string                   `json:"-"`
@@ -92,9 +92,11 @@ func (a SortedEndpoints) Less(i, j int) bool {
 	if firstDynamic && secondDynamic {
 		dynamicI := strings.Count(a[i].Operation.Path, "{")
 		dynamicJ := strings.Count(a[j].Operation.Path, "{")
+
 		if dynamicI == dynamicJ {
 			return len(a[i].Operation.Path) > len(a[j].Operation.Path)
 		}
+
 		return strings.Count(a[i].Operation.Path, "{") < strings.Count(a[j].Operation.Path, "{")
 	}
 
@@ -117,6 +119,7 @@ func (a SortedEndpoints) Less(i, j int) bool {
 // to the routes in the right order else requests will be picked up by the wrong handlers
 func EndpointsToSortedList(endpoints *map[entities.EntityType]models.Endpoint) SortedEndpoints {
 	eps := SortedEndpoints{}
+
 	for _, endpoint := range *endpoints {
 		for _, op := range endpoint.GetOperations() {
 			e := &EndpointWrapper{Endpoint: endpoint, Operation: op}
@@ -125,6 +128,7 @@ func EndpointsToSortedList(endpoints *map[entities.EntityType]models.Endpoint) S
 	}
 
 	sort.Sort(eps)
+
 	return eps
 }
 

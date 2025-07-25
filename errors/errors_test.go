@@ -9,6 +9,7 @@ import (
 func TestApiError(t *testing.T) {
 	// arrange
 	err := errors.New("yo")
+
 	var apierr = APIError{err, 200}
 
 	// assert
@@ -32,5 +33,4 @@ func TestRequestStatusCodes(t *testing.T) {
 	assert.Equal(t, "notimplemented", notimplementederror.Error())
 	assert.Equal(t, "notallowed", notallowederror.Error())
 	assert.Equal(t, "internalserver", internalservererror.Error())
-
 }

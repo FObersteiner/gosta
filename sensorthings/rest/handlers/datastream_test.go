@@ -96,7 +96,7 @@ func parseAndAssertDatastream(created entities.Datastream, r *http.Response, exp
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &d)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assertStatusCode(expectedStatusCode, r, t)
 	assertDatastream(created, d, t)
 }
@@ -115,7 +115,7 @@ func getAndAssertDatastreams(url string, t *testing.T) {
 	err = json.Unmarshal(body, &ar)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assertStatusCode(http.StatusOK, r, t)
 	assert.Equal(t, 2, ar.Count)
 

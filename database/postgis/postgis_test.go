@@ -19,7 +19,7 @@ func TestToIntIDForString(t *testing.T) {
 	intID, err := ToIntID(fid)
 
 	// assert
-	assert.True(t, intID == 4)
+	assert.Equal(t, intID, 4)
 	assert.True(t, err)
 }
 
@@ -31,7 +31,7 @@ func TestToIntIDForFloat(t *testing.T) {
 	intID, err := ToIntID(fid)
 
 	// assert
-	assert.True(t, intID == 6)
+	assert.Equal(t, intID, 6)
 	assert.True(t, err)
 }
 
@@ -67,7 +67,7 @@ func TestJsonToMapSucceeds(t *testing.T) {
 	res, err := JSONToMap(&jsonstring)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, res)
 	assert.NotNil(t, res["value"])
 }
@@ -80,7 +80,7 @@ func TestJsonToMapFails(t *testing.T) {
 	_, err := JSONToMap(&jsonstring)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestJsonToMapFailsWithWrongData(t *testing.T) {
@@ -91,5 +91,5 @@ func TestJsonToMapFailsWithWrongData(t *testing.T) {
 	_, err := JSONToMap(&jsonstring)
 
 	// assert
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }

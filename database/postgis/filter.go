@@ -35,9 +35,11 @@ func init() {
 
 func filterNavToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType, ignoreSelectAs bool) string {
 	q := ""
+
 	for i, part := range pn.Children {
 		if i == 0 {
 			q += fmt.Sprintf("%v ", strings.ToLower(qb.createFilter(et, part, false)))
+
 			continue
 		}
 
@@ -45,8 +47,10 @@ func filterNavToString(qb QueryBuilder, pn *godata.ParseNode, et entities.Entity
 		if i+1 == len(pn.Children) {
 			arrow = "->>"
 		}
+
 		q += fmt.Sprintf("%v '%v'", arrow, part.Token.Value)
 	}
+
 	return q
 }
 
@@ -91,19 +95,20 @@ func filterFuncToString(qb QueryBuilder, pn *godata.ParseNode, et entities.Entit
 }
 
 func filterDefaultToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType, ignoreSelectAs bool) string {
-	return fmt.Sprintf("%v", pn.Token.Value)
+	return pn.Token.Value
 }
 
 func filterOpToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType, ignoreSelectAs bool) string {
-	if pn.Token.Value == "add" {
+	switch pn.Token.Value {
+	case "add":
 		return qb.createArithmetic(et, pn, "+", "double precision")
-	} else if pn.Token.Value == "sub" {
+	case "sub":
 		return qb.createArithmetic(et, pn, "-", "double precision")
-	} else if pn.Token.Value == "mul" {
+	case "mul":
 		return qb.createArithmetic(et, pn, "*", "double precision")
-	} else if pn.Token.Value == "div" {
+	case "div":
 		return qb.createArithmetic(et, pn, "/", "double precision")
-	} else if pn.Token.Value == "mod" {
+	case "mod":
 		return qb.createArithmetic(et, pn, "%", "integer")
 	}
 

@@ -81,7 +81,7 @@ func parseAndAssertThing(created entities.Thing, r *http.Response, expectedStatu
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &thing)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assertStatusCode(expectedStatusCode, r, t)
 	assertThing(created, thing, t)
 }
@@ -101,7 +101,7 @@ func getAndAssertThings(url string, t *testing.T) {
 	err = json.Unmarshal(body, &ar)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assertStatusCode(http.StatusOK, r, t)
 	assert.Equal(t, 2, ar.Count)
 

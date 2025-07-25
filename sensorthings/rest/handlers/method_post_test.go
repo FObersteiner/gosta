@@ -15,6 +15,7 @@ func TestHandlePostTestWithWrongDataType(t *testing.T) {
 	thing := &entities.Thing{}
 	req, _ := http.NewRequest("POST", "/bla", nil)
 	req.Header.Set("Content-Type", "this is an invalid content-type")
+
 	handle := func() (interface{}, []error) { return testHandler() }
 
 	// act
@@ -30,6 +31,7 @@ func TestHandlePostTestWithNoBody(t *testing.T) {
 	thing := &entities.Thing{}
 	req, _ := http.NewRequest("POST", "/bla", nil)
 	req.Header.Set("Content-Type", "application/json")
+
 	handle := func() (interface{}, []error) { return testHandler() }
 
 	// act
@@ -45,6 +47,7 @@ func TestHandlePostTestWithWrongBody(t *testing.T) {
 	thing := &entities.Thing{}
 	req, _ := http.NewRequest("POST", "/bla", bytes.NewReader([]byte("{\"name\": 10}")))
 	req.Header.Set("Content-Type", "application/json")
+
 	handle := func() (interface{}, []error) { return testHandler() }
 
 	// act
@@ -60,6 +63,7 @@ func TestHandlePostTestWithError(t *testing.T) {
 	thing := &entities.Thing{}
 	req, _ := http.NewRequest("POST", "/bla", bytes.NewReader([]byte("{\"name\": \"thing1\", \"description\": \"test thing 1\"}")))
 	req.Header.Set("Content-Type", "application/json")
+
 	handle := func() (interface{}, []error) { return testHandlerError() }
 
 	// act
@@ -77,6 +81,7 @@ func TestHandlePostTestWithGoodBody(t *testing.T) {
 	thing.ID = 1
 	req, _ := http.NewRequest("POST", "/bla", bytes.NewReader([]byte("{ \"name\": \"thing1\", \"description\": \"test thing 1\"}")))
 	req.Header.Set("Content-Type", "application/json")
+
 	handle := func() (interface{}, []error) { return testHandler() }
 
 	// act

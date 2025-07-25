@@ -15,14 +15,16 @@ import (
 
 func historicalLocationParamFactory(values map[string]interface{}) (entities.Entity, error) {
 	h := &entities.HistoricalLocation{}
+
 	for as, value := range values {
 		if value == nil {
 			continue
 		}
 
-		if as == asMappings[entities.EntityTypeHistoricalLocation][historicalLocationID] {
+		switch as {
+		case asMappings[entities.EntityTypeHistoricalLocation][historicalLocationID]:
 			h.ID = value
-		} else if as == asMappings[entities.EntityTypeHistoricalLocation][historicalLocationTime] {
+		case asMappings[entities.EntityTypeHistoricalLocation][historicalLocationTime]:
 			t := value.(string)
 			h.Time = strings.Replace(t, "\"", "", 2)
 		}
@@ -39,6 +41,7 @@ func (gdb *GostDatabase) GetHistoricalLocation(id interface{}, qo *odata.QueryOp
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.HistoricalLocation{}, nil, intID, qo)
+
 	return processHistoricalLocation(gdb.Db, query, qi)
 }
 
@@ -46,6 +49,7 @@ func (gdb *GostDatabase) GetHistoricalLocation(id interface{}, qo *odata.QueryOp
 func (gdb *GostDatabase) GetHistoricalLocations(qo *odata.QueryOptions) ([]*entities.HistoricalLocation, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.HistoricalLocation{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.HistoricalLocation{}, nil, nil, qo)
+
 	return processHistoricalLocations(gdb.Db, query, qo, qi, countSQL)
 }
 
@@ -55,8 +59,10 @@ func (gdb *GostDatabase) GetHistoricalLocationsByLocation(locationID interface{}
 	if !ok {
 		return nil, 0, false, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
+
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.HistoricalLocation{}, &entities.Location{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.HistoricalLocation{}, &entities.Location{}, intID, qo)
+
 	return processHistoricalLocations(gdb.Db, query, qo, qi, countSQL)
 }
 
@@ -66,8 +72,10 @@ func (gdb *GostDatabase) GetHistoricalLocationsByThing(thingID interface{}, qo *
 	if !ok {
 		return nil, 0, false, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
+
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.HistoricalLocation{}, &entities.Thing{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.HistoricalLocation{}, &entities.Thing{}, intID, qo)
+
 	return processHistoricalLocations(gdb.Db, query, qo, qi, countSQL)
 }
 
@@ -87,10 +95,11 @@ func processHistoricalLocation(db *sql.DB, sql string, qi *QueryParseInfo) (*ent
 func processHistoricalLocations(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string) ([]*entities.HistoricalLocation, int, bool, error) {
 	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
-		return nil, 0, hasNext, fmt.Errorf("Error executing query %v", err)
+		return nil, 0, hasNext, fmt.Errorf("Error executing query %w", err)
 	}
 
 	hls := make([]*entities.HistoricalLocation, 0)
+
 	for _, d := range data {
 		entity := d.(*entities.HistoricalLocation)
 		hls = append(hls, entity)
@@ -100,7 +109,7 @@ func processHistoricalLocations(db *sql.DB, sql string, qo *odata.QueryOptions, 
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, hasNext, fmt.Errorf("Error executing count %v", err)
+			return nil, 0, hasNext, fmt.Errorf("Error executing count %w", err)
 		}
 	}
 
@@ -112,7 +121,9 @@ func processHistoricalLocations(db *sql.DB, sql string, qo *odata.QueryOptions, 
 // fails when a thing or location cannot be found for the given id's
 func (gdb *GostDatabase) PostHistoricalLocation(hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error) {
 	var hlID int
+
 	var err error
+
 	tid, ok := ToIntID(hl.Thing.ID)
 	if !ok || !gdb.ThingExists(tid) {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
@@ -126,6 +137,7 @@ func (gdb *GostDatabase) PostHistoricalLocation(hl *entities.HistoricalLocation)
 	}
 
 	query := fmt.Sprintf("INSERT INTO %s.historicallocation (time, thing_id) VALUES ($1, $2) RETURNING id", gdb.Schema)
+
 	err = gdb.Db.QueryRow(query, time.Now(), tid).Scan(&hlID)
 	if err != nil {
 		return nil, err
@@ -134,6 +146,7 @@ func (gdb *GostDatabase) PostHistoricalLocation(hl *entities.HistoricalLocation)
 	for _, l := range hl.Locations {
 		lid, _ := ToIntID(l.ID)
 		query := fmt.Sprintf("INSERT INTO %s.location_to_historicallocation (location_id, historicallocation_id) VALUES ($1, $2)  RETURNING historicallocation_id", gdb.Schema)
+
 		err = gdb.Db.QueryRow(query, lid, hlID).Scan(&lid)
 		if err != nil {
 			return nil, err
@@ -142,6 +155,7 @@ func (gdb *GostDatabase) PostHistoricalLocation(hl *entities.HistoricalLocation)
 
 	hl.ID = hlID
 	hl.Locations = nil
+
 	return hl, nil
 }
 
@@ -158,8 +172,11 @@ func (gdb *GostDatabase) PutHistoricalLocation(id interface{}, hl *entities.Hist
 // PatchHistoricalLocation updates a HistoricalLocation in the database
 func (gdb *GostDatabase) PatchHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error) {
 	var err error
+
 	var ok bool
+
 	var intID int
+
 	updates := make(map[string]interface{})
 
 	if intID, ok = ToIntID(id); !ok || !gdb.HistoricalLocationExists(intID) {
@@ -183,6 +200,7 @@ func (gdb *GostDatabase) PatchHistoricalLocation(id interface{}, hl *entities.Hi
 
 	for _, l := range hl.Locations {
 		query := fmt.Sprintf("INSERT INTO %s.location_to_historicallocation (location_id, historicallocation_id) VALUES ($1, $2)", gdb.Schema)
+
 		_, err := gdb.Db.Exec(query, l.ID, intID)
 		if err != nil {
 			return nil, err
@@ -190,6 +208,7 @@ func (gdb *GostDatabase) PatchHistoricalLocation(id interface{}, hl *entities.Hi
 	}
 
 	nhl, _ := gdb.GetHistoricalLocation(intID, nil)
+
 	return nhl, nil
 }
 

@@ -16,18 +16,21 @@ func (a *APIv1) GetDatastream(id interface{}, qo *odata.QueryOptions, path strin
 	}
 
 	a.SetLinks(ds, qo)
+
 	return ds, nil
 }
 
 // GetDatastreams retrieves an array of sensors based on the given query
 func (a *APIv1) GetDatastreams(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	datastreams, count, hasNext, err := a.db.GetDatastreams(qo)
+
 	return processDatastreams(a, datastreams, qo, path, count, hasNext, err)
 }
 
 // GetDatastreamsByThing returns all datastreams linked to the given thing
 func (a *APIv1) GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	datastreams, count, hasNext, err := a.db.GetDatastreamsByThing(thingID, qo)
+
 	return processDatastreams(a, datastreams, qo, path, count, hasNext, err)
 }
 
@@ -39,18 +42,21 @@ func (a *APIv1) GetDatastreamByObservation(observationID interface{}, qo *odata.
 	}
 
 	a.SetLinks(ds, qo)
+
 	return ds, nil
 }
 
 // GetDatastreamsBySensor returns all datastreams linked to the given sensor
 func (a *APIv1) GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	datastreams, count, hasNext, err := a.db.GetDatastreamsBySensor(sensorID, qo)
+
 	return processDatastreams(a, datastreams, qo, path, count, hasNext, err)
 }
 
 // GetDatastreamsByObservedProperty returns all datastreams linked to the given ObservedProperty
 func (a *APIv1) GetDatastreamsByObservedProperty(oID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	datastreams, count, hasNext, err := a.db.GetDatastreamsByObservedProperty(oID, qo)
+
 	return processDatastreams(a, datastreams, qo, path, count, hasNext, err)
 }
 
@@ -66,28 +72,36 @@ func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.
 	}
 
 	var data interface{} = datastreams
+
 	return a.createArrayResponse(count, hasNext, path, qo, data), nil
 }
 
 // PostDatastream adds a new datastream to the database
 func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datastream, []error) {
 	var errors []error
+
 	var err error
+
 	var postedObservedProperty *entities.ObservedProperty
+
 	var postedSensor *entities.Sensor
+
 	var postedObservations []*entities.Observation
 
 	_, errors = containsMandatoryParams(datastream)
 	if len(errors) > 0 {
 		a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
+
 		return nil, errors
 	}
 
 	// Check if ObservedProperty is deep inserted
 	if datastream.ObservedProperty != nil && datastream.ObservedProperty.ID == nil {
 		var op *entities.ObservedProperty
+
 		if op, err = a.db.PostObservedProperty(datastream.ObservedProperty); err != nil {
 			a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
+
 			return nil, []error{err}
 		}
 
@@ -98,8 +112,10 @@ func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datas
 	// Check if Sensor is deep inserted
 	if datastream.Sensor != nil && datastream.Sensor.ID == nil {
 		var s *entities.Sensor
+
 		if s, err = a.db.PostSensor(datastream.Sensor); err != nil {
 			a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
+
 			return nil, []error{err}
 		}
 
@@ -110,6 +126,7 @@ func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datas
 	ns, err := a.db.PostDatastream(datastream)
 	if err != nil {
 		a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
+
 		return nil, []error{err}
 	}
 
@@ -121,8 +138,10 @@ func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datas
 			observation.Datastream = ds
 
 			var o *entities.Observation
+
 			if o, errors = a.PostObservation(observation); len(errors) > 0 {
 				a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
+
 				return nil, errors
 			}
 
@@ -131,6 +150,7 @@ func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datas
 	}
 
 	ns.SetAllLinks(a.config.GetExternalServerURI())
+
 	return ns, nil
 }
 
@@ -153,6 +173,7 @@ func (a *APIv1) PostDatastreamByThing(thingID interface{}, datastream *entities.
 	t := &entities.Thing{}
 	t.ID = thingID
 	datastream.Thing = t
+
 	return a.PostDatastream(datastream)
 }
 
@@ -168,6 +189,7 @@ func (a *APIv1) PatchDatastream(id interface{}, datastream *entities.Datastream)
 // PutDatastream updates the given thing in the database
 func (a *APIv1) PutDatastream(id interface{}, datastream *entities.Datastream) (*entities.Datastream, []error) {
 	var err2 error
+
 	putdatastream, err2 := a.db.PutDatastream(id, datastream)
 	if err2 != nil {
 		return nil, []error{err2}

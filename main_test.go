@@ -5,7 +5,7 @@ import (
 )
 
 func TestVersionHandler(t *testing.T) {
-	//arrange
+	// arrange
 	/*server := "localhost"
 	port := 8088
 

@@ -1,8 +1,6 @@
 package mqtt
 
 import (
-	"fmt"
-
 	"github.com/gost/server/sensorthings/models"
 )
 
@@ -10,7 +8,7 @@ import (
 func CreateTopics(prefix string) []models.Topic {
 	topics := []models.Topic{
 		{
-			Path:    fmt.Sprintf("%s/#", prefix),
+			Path:    prefix + "/#",
 			Handler: MainMqttHandler,
 		},
 	}

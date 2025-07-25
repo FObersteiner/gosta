@@ -88,7 +88,7 @@ func parseAndAssertLocation(created entities.Location, r *http.Response, expecte
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &location)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assertStatusCode(expectedStatusCode, r, t)
 	assertLocation(created, location, t)
 }
@@ -109,7 +109,7 @@ func getAndAssertLocations(url string, t *testing.T) {
 	err = json.Unmarshal(body, &ar)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assertStatusCode(http.StatusOK, r, t)
 	assert.Equal(t, 2, ar.Count)
 

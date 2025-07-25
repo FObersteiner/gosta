@@ -9,20 +9,20 @@ import (
 )
 
 func TestCreateEndPoints(t *testing.T) {
-	//arrange
+	// arrange
 	endpoints := CreateEndPoints("http://test.com")
 
-	//assert
-	assert.Equal(t, 11, len(endpoints))
+	// assert
+	assert.Len(t, endpoints, 11)
 }
 
 func TestCreateEndPointVersion(t *testing.T) {
-	//arrange
+	// arrange
 	ve := CreateVersionEndpoint("http://test.com")
 
-	//assert
+	// assert
 	containsVersionPath := containsEndpoint("version", ve.Operations)
-	assert.Equal(t, true, containsVersionPath, "Version endpoint needs to contain an endpoint containing the path Version")
+	assert.True(t, containsVersionPath, "Version endpoint needs to contain an endpoint containing the path Version")
 }
 
 func containsEndpoint(epName string, eps []models.EndpointOperation) bool {

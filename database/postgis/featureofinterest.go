@@ -13,24 +13,27 @@ import (
 
 func featureOfInterestParamFactory(values map[string]interface{}) (entities.Entity, error) {
 	foi := &entities.FeatureOfInterest{}
+
 	for as, value := range values {
 		if value == nil {
 			continue
 		}
 
-		if as == asMappings[entities.EntityTypeFeatureOfInterest][foiID] {
+		switch as {
+		case asMappings[entities.EntityTypeFeatureOfInterest][foiID]:
 			foi.ID = value
-		} else if as == asMappings[entities.EntityTypeFeatureOfInterest][foiName] {
+		case asMappings[entities.EntityTypeFeatureOfInterest][foiName]:
 			foi.Name = value.(string)
-		} else if as == asMappings[entities.EntityTypeFeatureOfInterest][foiDescription] {
+		case asMappings[entities.EntityTypeFeatureOfInterest][foiDescription]:
 			foi.Description = value.(string)
-		} else if as == asMappings[entities.EntityTypeFeatureOfInterest][foiEncodingType] {
+		case asMappings[entities.EntityTypeFeatureOfInterest][foiEncodingType]:
 			encodingType := value.(int64)
 			if encodingType != 0 {
 				foi.EncodingType = entities.EncodingValues[encodingType].Value
 			}
-		} else if as == asMappings[entities.EntityTypeFeatureOfInterest][foiFeature] || as == asMappings[entities.EntityTypeFeatureOfInterest][foiGeoJSON] {
+		case asMappings[entities.EntityTypeFeatureOfInterest][foiFeature], asMappings[entities.EntityTypeFeatureOfInterest][foiGeoJSON]:
 			t := value.(string)
+
 			featureMap, err := JSONToMap(&t)
 			if err != nil {
 				return nil, err
@@ -52,7 +55,9 @@ func (gdb *GostDatabase) GetFeatureOfInterestIDByLocationID(id interface{}) (int
 	}
 
 	var fID interface{}
+
 	query := fmt.Sprintf("select id from %s.featureofinterest where original_location_id=%v", gdb.Schema, intID)
+
 	err := gdb.Db.QueryRow(query).Scan(&fID)
 	if err != nil {
 		return nil, err
@@ -73,6 +78,7 @@ func (gdb *GostDatabase) GetFeatureOfInterest(id interface{}, qo *odata.QueryOpt
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.FeatureOfInterest{}, nil, intID, qo)
+
 	return processFeatureOfInterest(gdb.Db, query, qi)
 }
 
@@ -84,6 +90,7 @@ func (gdb *GostDatabase) GetFeatureOfInterestByObservation(id interface{}, qo *o
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.FeatureOfInterest{}, &entities.Observation{}, intID, qo)
+
 	return processFeatureOfInterest(gdb.Db, query, qi)
 }
 
@@ -91,21 +98,25 @@ func (gdb *GostDatabase) GetFeatureOfInterestByObservation(id interface{}, qo *o
 func (gdb *GostDatabase) GetFeatureOfInterests(qo *odata.QueryOptions) ([]*entities.FeatureOfInterest, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.FeatureOfInterest{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.FeatureOfInterest{}, nil, nil, qo)
+
 	return processFeatureOfInterests(gdb.Db, query, qo, qi, countSQL)
 }
 
 // PostFeatureOfInterest inserts a new FeatureOfInterest into the database
 func (gdb *GostDatabase) PostFeatureOfInterest(f *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
 	var fID int
+
 	locationBytes, _ := json.Marshal(f.Feature)
 	encoding, _ := entities.CreateEncodingType(f.EncodingType)
-	sql2 := fmt.Sprintf("INSERT INTO %s.featureofinterest (name, description, encodingtype, feature, original_location_id, geojson) VALUES ($1, $2, $3, ST_SetSRID(public.ST_GeomFromGeoJSON('%s'),4326), $4, $5) RETURNING id", gdb.Schema, string(locationBytes[:]))
-	err := gdb.Db.QueryRow(sql2, f.Name, f.Description, encoding.Code, f.OriginalLocationID, string(locationBytes[:])).Scan(&fID)
+	sql2 := fmt.Sprintf("INSERT INTO %s.featureofinterest (name, description, encodingtype, feature, original_location_id, geojson) VALUES ($1, $2, $3, ST_SetSRID(public.ST_GeomFromGeoJSON('%s'),4326), $4, $5) RETURNING id", gdb.Schema, string(locationBytes))
+
+	err := gdb.Db.QueryRow(sql2, f.Name, f.Description, encoding.Code, f.OriginalLocationID, string(locationBytes)).Scan(&fID)
 	if err != nil {
 		return nil, err
 	}
 
 	f.ID = fID
+
 	return f, nil
 }
 
@@ -130,10 +141,11 @@ func processFeatureOfInterest(db *sql.DB, sql string, qi *QueryParseInfo) (*enti
 func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string) ([]*entities.FeatureOfInterest, int, bool, error) {
 	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
-		return nil, 0, false, fmt.Errorf("Error executing query %v", err)
+		return nil, 0, false, fmt.Errorf("Error executing query %w", err)
 	}
 
 	fois := make([]*entities.FeatureOfInterest, 0)
+
 	for _, d := range data {
 		entity := d.(*entities.FeatureOfInterest)
 		fois = append(fois, entity)
@@ -143,7 +155,7 @@ func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions, q
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, false, fmt.Errorf("Error executing count %v", err)
+			return nil, 0, false, fmt.Errorf("Error executing count %w", err)
 		}
 	}
 
@@ -153,8 +165,11 @@ func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions, q
 // PatchFeatureOfInterest updates a FeatureOfInterest in the database
 func (gdb *GostDatabase) PatchFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
 	var err error
+
 	var ok bool
+
 	var intID int
+
 	updates := make(map[string]interface{})
 
 	if intID, ok = ToIntID(id); !ok || !gdb.FeatureOfInterestExists(intID) {
@@ -176,8 +191,8 @@ func (gdb *GostDatabase) PatchFeatureOfInterest(id interface{}, foi *entities.Fe
 
 	if len(foi.Feature) > 0 {
 		locationBytes, _ := json.Marshal(foi.Feature)
-		updates["feature"] = fmt.Sprintf("ST_SetSRID(public.ST_GeomFromGeoJSON('%s'),4326)", string(locationBytes[:]))
-		updates["geojson"] = string(locationBytes[:])
+		updates["feature"] = fmt.Sprintf("ST_SetSRID(public.ST_GeomFromGeoJSON('%s'),4326)", string(locationBytes))
+		updates["geojson"] = string(locationBytes)
 	}
 
 	if err = gdb.updateEntityColumns("featureofinterest", updates, intID); err != nil {
@@ -185,6 +200,7 @@ func (gdb *GostDatabase) PatchFeatureOfInterest(id interface{}, foi *entities.Fe
 	}
 
 	nfoi, _ := gdb.GetFeatureOfInterest(intID, nil)
+
 	return nfoi, nil
 }
 

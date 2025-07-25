@@ -11,6 +11,7 @@ import (
 func TestHandleRoot(t *testing.T) {
 	// arrange
 	count := 0
+
 	eps := newMockAPI().GetEndpoints()
 	for _, e := range *eps {
 		if e.ShowOutputInfo() {

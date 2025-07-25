@@ -1,16 +1,17 @@
 package configuration
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
-	"os"
 )
 
-var configLocation = "../config.yaml"
-var configFake = "nonexistingfile.yaml"
-var configWrongData = "testreadconfig.yaml"
+var (
+	configLocation  = "../config.yaml"
+	configFake      = "nonexistingfile.yaml"
+	configWrongData = "testreadconfig.yaml"
+)
 
 var data = `
 server:
@@ -49,21 +50,23 @@ func TestReadFile(t *testing.T) {
 func TestReadConfig(t *testing.T) {
 	// try parsing data, this should parse if not give error
 	content := []byte(data)
+
 	cfg, err := readConfig(content)
 	if err != nil {
 		t.Error("Given static config data could not be parsed into config struct")
 	}
+
 	assert.NotNil(t, cfg)
 
 	// check some random params
 	assert.Equal(t, 8080, cfg.Server.Port)
-	assert.Equal(t, false, cfg.Database.SSL)
+	assert.False(t, cfg.Database.SSL)
 	assert.Equal(t, "192.168.40.10", cfg.Database.Host)
 
 	// put in some false content this should fail
 	falseContent := []byte("aaabbbccc")
 	cfg, err = readConfig(falseContent)
-	assert.NotNil(t, err, "ReadConfig should have returned an error")
+	assert.Error(t, err, "ReadConfig should have returned an error")
 }
 
 func TestGetConfig(t *testing.T) {
@@ -85,9 +88,10 @@ func TestGetConfig(t *testing.T) {
 
 	// write file with some fake data, GetConfig should return error
 	d1 := []byte("aaabbbccc")
-	_ = ioutil.WriteFile(configWrongData, d1, 0644)
+	_ = os.WriteFile(configWrongData, d1, 0644)
 	_, err = GetConfig(configWrongData)
 	_ = os.Remove(configWrongData)
+
 	if err == nil {
 		t.Error("GetConfig should have returned an error on reading a fake config", err)
 	}

@@ -20,6 +20,7 @@ func (a *APIv1) PostLocation(location *entities.Location) (*entities.Location, [
 
 	if location.EncodingType != entities.EncodingGeoJSON.Value {
 		err := errors.New("Encoding not supported. Supported encoding: " + entities.EncodingGeoJSON.Value)
+
 		return nil, []error{err}
 	}
 
@@ -27,6 +28,7 @@ func (a *APIv1) PostLocation(location *entities.Location) (*entities.Location, [
 	if err2 != nil {
 		return nil, []error{err2}
 	}
+
 	l.SetAllLinks(a.config.GetExternalServerURI())
 	a.sendOverMQTT(l, "Locations")
 
@@ -37,7 +39,9 @@ func (a *APIv1) PostLocation(location *entities.Location) (*entities.Location, [
 // the new location will be linked to a thing if needed
 func (a *APIv1) PostLocationByThing(thingID interface{}, location *entities.Location) (*entities.Location, []error) {
 	var err []error
+
 	var err2 error
+
 	l, err := a.PostLocation(location)
 	if len(err) > 0 {
 		return nil, err
@@ -89,24 +93,28 @@ func (a *APIv1) GetLocation(id interface{}, qo *odata.QueryOptions, path string)
 	}
 
 	a.SetLinks(l, qo)
+
 	return l, nil
 }
 
 // GetLocations retrieves all locations from the database and returns it as and ArrayResponse
 func (a *APIv1) GetLocations(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	locations, count, hasNext, err := a.db.GetLocations(qo)
+
 	return processLocations(a, locations, qo, path, count, hasNext, err)
 }
 
 // GetLocationsByHistoricalLocation retrieves the latest locations linked to a HistoricalLocation
 func (a *APIv1) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	locations, count, hasNext, err := a.db.GetLocationsByHistoricalLocation(hlID, qo)
+
 	return processLocations(a, locations, qo, path, count, hasNext, err)
 }
 
 // GetLocationsByThing retrieves the latest locations linked to a thing
 func (a *APIv1) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	locations, count, hasNext, err := a.db.GetLocationsByThing(thingID, qo)
+
 	return processLocations(a, locations, qo, path, count, hasNext, err)
 }
 
@@ -118,6 +126,7 @@ func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryO
 	}
 
 	var data interface{} = locations
+
 	return a.createArrayResponse(count, hasNext, path, qo, data), nil
 }
 
@@ -130,6 +139,7 @@ func (a *APIv1) PatchLocation(id interface{}, location *entities.Location) (*ent
 	if len(location.EncodingType) != 0 {
 		if location.EncodingType != entities.EncodingGeoJSON.Value {
 			err := errors.New("Encoding not supported. Supported encoding: " + entities.EncodingGeoJSON.Value)
+
 			return nil, err
 		}
 	}
@@ -140,12 +150,14 @@ func (a *APIv1) PatchLocation(id interface{}, location *entities.Location) (*ent
 // PutLocation updates the given thing in the database
 func (a *APIv1) PutLocation(id interface{}, location *entities.Location) (*entities.Location, []error) {
 	var err2 error
+
 	putlocation, err2 := a.db.PutLocation(id, location)
 	if err2 != nil {
 		return nil, []error{err2}
 	}
 
 	putlocation.SetAllLinks(a.config.GetExternalServerURI())
+
 	return putlocation, nil
 }
 
@@ -160,5 +172,6 @@ func (a *APIv1) LinkLocation(thingID interface{}, locationID interface{}) error 
 	if err != nil {
 		return gostErrors.NewBadRequestError(err)
 	}
+
 	return nil
 }

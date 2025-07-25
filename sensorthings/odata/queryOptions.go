@@ -46,7 +46,7 @@ func (q *QueryOptions) checkMap(mapToCheck map[string][]string, endpoint, reques
 
 	// return true if not found for registered endpoint
 	for _, supported := range mapToCheck[endpoint] {
-		if strings.ToLower(supported) == strings.ToLower(request) {
+		if strings.EqualFold(supported, request) {
 			return true
 		}
 	}
@@ -97,23 +97,28 @@ func ParseURLQuery(query url.Values) (*QueryOptions, error) {
 	if value != "" {
 		val = GoDataValueQuery(true)
 	}
+
 	result.Value = &val
 
 	value = query.Get("$ref")
 	ref := GoDataRefQuery(false)
+
 	if value != "" {
 		ref = GoDataRefQuery(true)
 	}
+
 	result.Ref = &ref
 
 	value = query.Get("$collectioncount")
 	cc := GoDataCollectionCountQuery(false)
+
 	if value != "" {
 		cc = GoDataCollectionCountQuery(true)
 	}
+
 	result.CollectionCount = &cc
 
-	//store raw queries
+	// store raw queries
 	result.RawExpand = query.Get("$expand")
 	result.RawFilter = query.Get("$filter")
 	result.RawOrderBy = query.Get("$orderby")
@@ -126,25 +131,27 @@ func ParseURLQuery(query url.Values) (*QueryOptions, error) {
 // went wrong with parsing the query into QueryOptions and will contain information
 // on what went wrong
 func GetQueryOptions(r *http.Request, maxEntities int) (*QueryOptions, []error) {
-	//If request contains parameters from route wildcard convert it to a select query
+	// If request contains parameters from route wildcard convert it to a select query
 	vars := mux.Vars(r)
 	value := vars["params"]
 
 	// Encode semicolon to %3B, semicolon is used in $expand with multiple inline queries: $expand=Datastreams/Observations($select=result;$top=2)
 	// when r.URL.Query() is called the value will be cut off after semicolon, using r.URL.EscapedPath() won't work	either
-	r.URL.RawQuery = strings.Replace(r.URL.RawQuery, ";", "%3B", -1)
+	r.URL.RawQuery = strings.ReplaceAll(r.URL.RawQuery, ";", "%3B")
 
 	values := r.URL.Query()
+
 	if len(vars["params"]) > 0 {
-		//If $ref found create select query with id
-		if vars["params"] == "$ref" {
+		// If $ref found create select query with id
+		switch vars["params"] {
+		case "$ref":
 			value = "id"
 			values["$ref"] = []string{"true"}
 			values["$select"] = []string{value}
-		} else if vars["params"] == "$count" {
+		case "$count":
 			values["$collectioncount"] = []string{"true"}
 			values["$count"] = []string{"true"}
-		} else {
+		default:
 			values["$select"] = []string{value}
 		}
 	}

@@ -15,19 +15,22 @@ import (
 
 func thingParamFactory(values map[string]interface{}) (entities.Entity, error) {
 	t := &entities.Thing{}
+
 	for as, value := range values {
 		if value == nil {
 			continue
 		}
 
-		if as == asMappings[entities.EntityTypeThing][thingID] {
+		switch as {
+		case asMappings[entities.EntityTypeThing][thingID]:
 			t.ID = value
-		} else if as == asMappings[entities.EntityTypeThing][thingName] {
+		case asMappings[entities.EntityTypeThing][thingName]:
 			t.Name = value.(string)
-		} else if as == asMappings[entities.EntityTypeThing][thingDescription] {
+		case asMappings[entities.EntityTypeThing][thingDescription]:
 			t.Description = value.(string)
-		} else if as == asMappings[entities.EntityTypeThing][thingProperties] {
+		case asMappings[entities.EntityTypeThing][thingProperties]:
 			p := value.(string)
+
 			propertiesMap, err := JSONToMap(&p)
 			if err != nil {
 				return nil, err
@@ -48,10 +51,11 @@ func (gdb *GostDatabase) GetThing(id interface{}, qo *odata.QueryOptions) (*enti
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Thing{}, nil, intID, qo)
+
 	return processThing(gdb.Db, query, qi)
 }
 
-//GetThingByDatastream retrieves the thing linked to a datastream
+// GetThingByDatastream retrieves the thing linked to a datastream
 func (gdb *GostDatabase) GetThingByDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Thing, error) {
 	intID, ok := ToIntID(id)
 	if !ok {
@@ -59,10 +63,11 @@ func (gdb *GostDatabase) GetThingByDatastream(id interface{}, qo *odata.QueryOpt
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Thing{}, &entities.Datastream{}, intID, qo)
+
 	return processThing(gdb.Db, query, qi)
 }
 
-//GetThingsByLocation retrieves the thing linked to a location
+// GetThingsByLocation retrieves the thing linked to a location
 func (gdb *GostDatabase) GetThingsByLocation(id interface{}, qo *odata.QueryOptions) ([]*entities.Thing, int, bool, error) {
 	intID, ok := ToIntID(id)
 	if !ok {
@@ -71,10 +76,11 @@ func (gdb *GostDatabase) GetThingsByLocation(id interface{}, qo *odata.QueryOpti
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Thing{}, &entities.Location{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Thing{}, &entities.Location{}, intID, qo)
+
 	return processThings(gdb.Db, query, qo, qi, countSQL)
 }
 
-//GetThingByHistoricalLocation retrieves the thing linked to a HistoricalLocation
+// GetThingByHistoricalLocation retrieves the thing linked to a HistoricalLocation
 func (gdb *GostDatabase) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOptions) (*entities.Thing, error) {
 	intID, ok := ToIntID(id)
 	if !ok {
@@ -82,6 +88,7 @@ func (gdb *GostDatabase) GetThingByHistoricalLocation(id interface{}, qo *odata.
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Thing{}, &entities.HistoricalLocation{}, intID, qo)
+
 	return processThing(gdb.Db, query, qi)
 }
 
@@ -89,6 +96,7 @@ func (gdb *GostDatabase) GetThingByHistoricalLocation(id interface{}, qo *odata.
 func (gdb *GostDatabase) GetThings(qo *odata.QueryOptions) ([]*entities.Thing, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Thing{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Thing{}, nil, nil, qo)
+
 	return processThings(gdb.Db, query, qo, qi, countSQL)
 }
 
@@ -108,10 +116,11 @@ func processThing(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Thing, 
 func processThings(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string) ([]*entities.Thing, int, bool, error) {
 	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
-		return nil, 0, hasNext, fmt.Errorf("Error executing query %v", err)
+		return nil, 0, hasNext, fmt.Errorf("Error executing query %w", err)
 	}
 
 	things := make([]*entities.Thing, 0)
+
 	for _, d := range data {
 		entity := d.(*entities.Thing)
 		things = append(things, entity)
@@ -121,7 +130,7 @@ func processThings(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryPars
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, hasNext, fmt.Errorf("Error executing count %v", err)
+			return nil, 0, hasNext, fmt.Errorf("Error executing count %w", err)
 		}
 	}
 
@@ -132,14 +141,18 @@ func processThings(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryPars
 // returns the created Thing including the generated id
 func (gdb *GostDatabase) PostThing(thing *entities.Thing) (*entities.Thing, error) {
 	jsonProperties, _ := json.Marshal(thing.Properties)
+
 	var thingID int
+
 	query := fmt.Sprintf("INSERT INTO %s.thing (name, description, properties) VALUES ($1, $2, $3) RETURNING id", gdb.Schema)
+
 	err := gdb.Db.QueryRow(query, thing.Name, thing.Description, jsonProperties).Scan(&thingID)
 	if err != nil {
 		return nil, err
 	}
 
 	thing.ID = thingID
+
 	return thing, nil
 }
 
@@ -153,11 +166,15 @@ func (gdb *GostDatabase) PutThing(id interface{}, thing *entities.Thing) (*entit
 // returns the patched Thing
 func (gdb *GostDatabase) PatchThing(id interface{}, thing *entities.Thing) (*entities.Thing, error) {
 	var err error
+
 	var ok bool
+
 	var intID int
+
 	updates := make(map[string]interface{})
 
 	thing.ID = id
+
 	if intID, ok = ToIntID(id); !ok || !gdb.ThingExists(intID) {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
@@ -172,7 +189,7 @@ func (gdb *GostDatabase) PatchThing(id interface{}, thing *entities.Thing) (*ent
 
 	if len(thing.Properties) > 0 {
 		jsonProperties, _ := json.Marshal(thing.Properties)
-		updates[thingProperties] = string(jsonProperties[:])
+		updates[thingProperties] = string(jsonProperties)
 	}
 
 	if thing.Locations != nil {
@@ -183,12 +200,15 @@ func (gdb *GostDatabase) PatchThing(id interface{}, thing *entities.Thing) (*ent
 				// todo: check if location exist
 				if location != nil {
 					query := fmt.Sprintf("update %s.thing_to_location set location_id  = $1 where thing_id= $2", gdb.Schema)
+
 					res, err := gdb.Db.Exec(query, location.ID, intID)
 					if err != nil {
 						return nil, err
 					}
+
 					if c, _ := res.RowsAffected(); c == 0 {
 						sqlInsert := fmt.Sprintf("insert into %s.thing_to_location (location_id,thing_id) values ($1, $2)", gdb.Schema)
+
 						_, err := gdb.Db.Exec(sqlInsert, location.ID, intID)
 						if err != nil {
 							return nil, err
@@ -212,6 +232,7 @@ func (gdb *GostDatabase) PatchThing(id interface{}, thing *entities.Thing) (*ent
 	}
 
 	nt, _ := gdb.GetThing(intID, nil)
+
 	return nt, nil
 }
 

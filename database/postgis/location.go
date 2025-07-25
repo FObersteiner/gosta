@@ -16,24 +16,27 @@ import (
 
 func locationParamFactory(values map[string]interface{}) (entities.Entity, error) {
 	l := &entities.Location{}
+
 	for as, value := range values {
 		if value == nil {
 			continue
 		}
 
-		if as == asMappings[entities.EntityTypeLocation][locationID] {
+		switch as {
+		case asMappings[entities.EntityTypeLocation][locationID]:
 			l.ID = value
-		} else if as == asMappings[entities.EntityTypeLocation][locationName] {
+		case asMappings[entities.EntityTypeLocation][locationName]:
 			l.Name = value.(string)
-		} else if as == asMappings[entities.EntityTypeLocation][locationDescription] {
+		case asMappings[entities.EntityTypeLocation][locationDescription]:
 			l.Description = value.(string)
-		} else if as == asMappings[entities.EntityTypeLocation][locationEncodingType] {
+		case asMappings[entities.EntityTypeLocation][locationEncodingType]:
 			encodingType := value.(int64)
 			if encodingType != 0 {
 				l.EncodingType = entities.EncodingValues[encodingType].Value
 			}
-		} else if as == asMappings[entities.EntityTypeLocation][locationLocation] || as == asMappings[entities.EntityTypeLocation][locationGeoJSON] {
+		case asMappings[entities.EntityTypeLocation][locationLocation], asMappings[entities.EntityTypeLocation][locationGeoJSON]:
 			t := value.(string)
+
 			locationMap, err := JSONToMap(&t)
 			if err != nil {
 				return nil, err
@@ -54,6 +57,7 @@ func (gdb *GostDatabase) GetLocation(id interface{}, qo *odata.QueryOptions) (*e
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, nil, intID, qo)
+
 	return processLocation(gdb.Db, query, qi)
 }
 
@@ -61,6 +65,7 @@ func (gdb *GostDatabase) GetLocation(id interface{}, qo *odata.QueryOptions) (*e
 func (gdb *GostDatabase) GetLocations(qo *odata.QueryOptions) ([]*entities.Location, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Location{}, nil, nil, qo)
+
 	return processLocations(gdb.Db, query, qo, qi, countSQL, false)
 }
 
@@ -73,6 +78,7 @@ func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID interface{}, qo *
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, &entities.HistoricalLocation{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Location{}, &entities.HistoricalLocation{}, intID, qo)
+
 	return processLocations(gdb.Db, query, qo, qi, countSQL, true)
 }
 
@@ -90,6 +96,7 @@ func (gdb *GostDatabase) GetLocationByDatastreamID(datastreamID interface{}, qo 
 	qo.Top = &tq
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, &entities.Datastream{}, intID, qo)
+
 	return processLocation(gdb.Db, query, qi)
 }
 
@@ -105,6 +112,7 @@ func (gdb *GostDatabase) GetLocationsByThing(thingID interface{}, qo *odata.Quer
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, &entities.Thing{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Location{}, &entities.Thing{}, intID, qo)
+
 	return processLocations(gdb.Db, query, qo, qi, countSQL, true)
 }
 
@@ -124,10 +132,11 @@ func processLocation(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Loca
 func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string, disableNextLink bool) ([]*entities.Location, int, bool, error) {
 	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
-		return nil, 0, hasNext, fmt.Errorf("Error executing query %v", err)
+		return nil, 0, hasNext, fmt.Errorf("Error executing query %w", err)
 	}
 
 	locations := make([]*entities.Location, 0)
+
 	for _, d := range data {
 		entity := d.(*entities.Location)
 		locations = append(locations, entity)
@@ -137,7 +146,7 @@ func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryP
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, hasNext, fmt.Errorf("error executing count %v", err)
+			return nil, 0, hasNext, fmt.Errorf("error executing count %w", err)
 		}
 	}
 
@@ -152,16 +161,19 @@ func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryP
 // returns the created Location including the generated id
 func (gdb *GostDatabase) PostLocation(location *entities.Location) (*entities.Location, error) {
 	var locationID int
+
 	locationBytes, _ := json.Marshal(location.Location)
 	encoding, _ := entities.CreateEncodingType(location.EncodingType)
 
-	sql2 := fmt.Sprintf("INSERT INTO %s.location (name, description, encodingtype, geojson, location) VALUES ($1, $2, $3, $4, ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)) RETURNING id", gdb.Schema, string(locationBytes[:]))
-	err := gdb.Db.QueryRow(sql2, location.Name, location.Description, encoding.Code, string(locationBytes[:])).Scan(&locationID)
+	sql2 := fmt.Sprintf("INSERT INTO %s.location (name, description, encodingtype, geojson, location) VALUES ($1, $2, $3, $4, ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)) RETURNING id", gdb.Schema, string(locationBytes))
+
+	err := gdb.Db.QueryRow(sql2, location.Name, location.Description, encoding.Code, string(locationBytes)).Scan(&locationID)
 	if err != nil {
 		return nil, err
 	}
 
 	location.ID = locationID
+
 	return location, nil
 }
 
@@ -173,8 +185,11 @@ func (gdb *GostDatabase) LocationExists(id interface{}) bool {
 // PatchLocation updates a Location in the database
 func (gdb *GostDatabase) PatchLocation(id interface{}, l *entities.Location) (*entities.Location, error) {
 	var err error
+
 	var ok bool
+
 	var intID int
+
 	updates := make(map[string]interface{})
 
 	if intID, ok = ToIntID(id); !ok || !gdb.LocationExists(intID) {
@@ -191,8 +206,8 @@ func (gdb *GostDatabase) PatchLocation(id interface{}, l *entities.Location) (*e
 
 	if len(l.Location) > 0 {
 		locationBytes, _ := json.Marshal(l.Location)
-		updates["location"] = fmt.Sprintf("ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)", string(locationBytes[:]))
-		updates["geojson"] = string(locationBytes[:])
+		updates["location"] = fmt.Sprintf("ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)", string(locationBytes))
+		updates["geojson"] = string(locationBytes)
 	}
 
 	if len(l.EncodingType) > 0 {
@@ -205,6 +220,7 @@ func (gdb *GostDatabase) PatchLocation(id interface{}, l *entities.Location) (*e
 	}
 
 	ns, _ := gdb.GetLocation(intID, nil)
+
 	return ns, nil
 }
 

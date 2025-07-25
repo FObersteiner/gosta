@@ -23,13 +23,16 @@ func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reques
 	err := reader.ParseEntity(entity, byteData)
 	if err != nil {
 		writer.SendError(w, []error{err}, indentJSON)
+
 		return
 	}
 
 	handle := *h
+
 	data, err2 := handle()
 	if err2 != nil {
 		writer.SendError(w, err2, indentJSON)
+
 		return
 	}
 

@@ -14,7 +14,7 @@ func TestGetExternalUri(t *testing.T) {
 	// act
 	var uri = cfg.GetExternalServerURI()
 	// assert
-	assert.Equal(t, uri, "http://test.com", "Trailing slash not removed by GetExternalServerUri")
+	assert.Equal(t, "http://test.com", uri, "Trailing slash not removed by GetExternalServerUri")
 }
 
 func TestGetInternalUri(t *testing.T) {

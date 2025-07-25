@@ -17,24 +17,28 @@ func (a *APIv1) GetHistoricalLocation(id interface{}, qo *odata.QueryOptions, pa
 	}
 
 	a.SetLinks(hl, qo)
+
 	return hl, nil
 }
 
 // GetHistoricalLocations retrieves all HistoricalLocations
 func (a *APIv1) GetHistoricalLocations(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	hl, count, hasNext, err := a.db.GetHistoricalLocations(qo)
+
 	return processHistoricalLocations(a, hl, qo, path, count, hasNext, err)
 }
 
 // GetHistoricalLocationsByLocation retrieves all HistoricalLocations linked to a given location
 func (a *APIv1) GetHistoricalLocationsByLocation(locationID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	hl, count, hasNext, err := a.db.GetHistoricalLocationsByLocation(locationID, qo)
+
 	return processHistoricalLocations(a, hl, qo, path, count, hasNext, err)
 }
 
 // GetHistoricalLocationsByThing retrieves all HistoricalLocations linked to a given thing
 func (a *APIv1) GetHistoricalLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	hl, count, hasNext, err := a.db.GetHistoricalLocationsByThing(thingID, qo)
+
 	return processHistoricalLocations(a, hl, qo, path, count, hasNext, err)
 }
 
@@ -46,6 +50,7 @@ func processHistoricalLocations(a *APIv1, historicalLocations []*entities.Histor
 	}
 
 	var data interface{} = historicalLocations
+
 	return a.createArrayResponse(count, hasNext, path, qo, data), nil
 }
 
@@ -60,7 +65,9 @@ func (a *APIv1) PostHistoricalLocation(hl *entities.HistoricalLocation) (*entiti
 	if err2 != nil {
 		return nil, []error{err2}
 	}
+
 	l.SetAllLinks(a.config.GetExternalServerURI())
+
 	return l, nil
 }
 
@@ -70,7 +77,9 @@ func (a *APIv1) PutHistoricalLocation(id interface{}, hl *entities.HistoricalLoc
 	if err2 != nil {
 		return nil, []error{err2}
 	}
+
 	l.SetAllLinks(a.config.GetExternalServerURI())
+
 	return l, nil
 }
 

@@ -88,7 +88,7 @@ func parseAndAssertObservation(created entities.Observation, r *http.Response, e
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &obs)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assertStatusCode(expectedStatusCode, r, t)
 	assertObservation(created, obs, t)
 }
@@ -107,7 +107,7 @@ func getAndAssertObservations(url string, t *testing.T) {
 	err = json.Unmarshal(body, &ar)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assertStatusCode(http.StatusOK, r, t)
 	assert.Equal(t, 2, ar.Count)
 

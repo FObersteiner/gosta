@@ -1,8 +1,6 @@
 package api
 
 import (
-	"fmt"
-
 	entities "github.com/gost/core"
 )
 
@@ -15,20 +13,22 @@ func (a *APIv1) PostCreateObservations(data *entities.CreateObservations) ([]str
 	}
 
 	returnList := make([]string, 0)
-	for i := 0; i < len(data.Datastreams); i++ {
-		for j := 0; j < len(data.Datastreams[i].Observations); j++ {
+
+	for i := range len(data.Datastreams) {
+		for j := range len(data.Datastreams[i].Observations) {
 			obs, errors := a.PostObservationByDatastream(data.Datastreams[i].ID, data.Datastreams[i].Observations[j])
 			if errors == nil || len(errors) == 0 {
 				returnList = append(returnList, obs.GetSelfLink())
 			} else {
 				errorString := ""
-				for k := 0; k < len(errors); k++ {
+				for k := range len(errors) {
 					if len(errorString) > 0 {
 						errorString += ", "
 					}
 
-					errorString += fmt.Sprintf("%v", errors[k].Error())
+					errorString += errors[k].Error()
 				}
+
 				returnList = append(returnList, errorString)
 			}
 		}

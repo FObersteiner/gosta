@@ -10,7 +10,7 @@ import (
 )
 
 func TestEndPointGetNameShouldReturnCorrectName(t *testing.T) {
-	//arrange
+	// arrange
 	endpoint := Endpoint{}
 	endpoint.Name = "test"
 	endpoint.URL = "http://www.nu.nl"
@@ -24,13 +24,13 @@ func TestEndPointGetNameShouldReturnCorrectName(t *testing.T) {
 	sel := endpoint.GetSupportedSelectParams()
 	// point.AreQueryOptionsSupported()
 
-	//assert
+	// assert
 	assert.Equal(t, "test", name, "name should be correct")
-	assert.True(t, !output)
-	assert.Equal(t, url, "http://www.nu.nl")
-	assert.True(t, len(ops) == 0)
-	assert.True(t, len(expand) == 0)
-	assert.True(t, len(sel) == 0)
+	assert.False(t, output)
+	assert.Equal(t, "http://www.nu.nl", url)
+	assert.Equal(t, len(ops), 0)
+	assert.Equal(t, len(expand), 0)
+	assert.Equal(t, len(sel), 0)
 }
 
 func TestIsDynamic(t *testing.T) {
@@ -76,15 +76,15 @@ func TestEndPointSort(t *testing.T) {
 	eps := EndpointsToSortedList(&endpoints)
 
 	// assert
-	assert.True(t, len(eps) == 7, "Number of Endpoints should be 7")
+	assert.Equal(t, len(eps), 7, "Number of Endpoints should be 7")
 	// post becomes first after sorting
-	assert.True(t, eps[0].Operation.Path == "ep2")
-	assert.True(t, eps[1].Operation.Path == "ep1")
-	assert.True(t, eps[2].Operation.Path == "ep7")
-	assert.True(t, eps[3].Operation.Path == "ep6{test}")
-	assert.True(t, eps[4].Operation.Path == "{c:.*}ep3")
-	assert.True(t, eps[5].Operation.Path == "ep4{c:.*}")
-	assert.True(t, eps[6].Operation.Path == "{c:.*}ep5{test}")
+	assert.Equal(t, eps[0].Operation.Path, "ep2")
+	assert.Equal(t, eps[1].Operation.Path, "ep1")
+	assert.Equal(t, eps[2].Operation.Path, "ep7")
+	assert.Equal(t, eps[3].Operation.Path, "ep6{test}")
+	assert.Equal(t, eps[4].Operation.Path, "{c:.*}ep3")
+	assert.Equal(t, eps[5].Operation.Path, "ep4{c:.*}")
+	assert.Equal(t, eps[6].Operation.Path, "{c:.*}ep5{test}")
 }
 
 func TestEndPointSortDynamic(t *testing.T) {
@@ -102,10 +102,10 @@ func TestEndPointSortDynamic(t *testing.T) {
 	sort.Sort(eps)
 
 	// assert
-	assert.True(t, len(eps) == 2, "Number of Endpoints should be 2")
+	assert.Equal(t, len(eps), 2, "Number of Endpoints should be 2")
 	// when both urls are dynamic, the longer path comes first
-	assert.True(t, eps[0].Operation.Path == "ep2{}longer")
-	assert.True(t, eps[1].Operation.Path == "ep1{}")
+	assert.Equal(t, eps[0].Operation.Path, "ep2{}longer")
+	assert.Equal(t, eps[1].Operation.Path, "ep1{}")
 }
 
 func TestEndPointSortlength(t *testing.T) {
@@ -123,10 +123,10 @@ func TestEndPointSortlength(t *testing.T) {
 	sort.Sort(eps)
 
 	// assert
-	assert.True(t, len(eps) == 2, "Number of Endpoints should be 2")
+	assert.Equal(t, len(eps), 2, "Number of Endpoints should be 2")
 	// when both urls are dynamic, the longer path comes first
-	assert.True(t, eps[0].Operation.Path == "ep2longer")
-	assert.True(t, eps[1].Operation.Path == "ep1")
+	assert.Equal(t, eps[0].Operation.Path, "ep2longer")
+	assert.Equal(t, eps[1].Operation.Path, "ep1")
 }
 
 func TestEndPointNotDynamic(t *testing.T) {
@@ -143,6 +143,6 @@ func TestEndPointNotDynamic(t *testing.T) {
 	sort.Sort(eps)
 
 	// assert
-	assert.True(t, eps[0].Operation.Path == "ep2longer")
-	assert.True(t, eps[1].Operation.Path == "ep1 {c:.*}")
+	assert.Equal(t, eps[0].Operation.Path, "ep2longer")
+	assert.Equal(t, eps[1].Operation.Path, "ep1 {c:.*}")
 }

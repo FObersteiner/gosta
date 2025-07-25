@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-
 	"os"
 	"os/signal"
 	"syscall"
@@ -32,15 +31,20 @@ var (
 
 func initialize() {
 	flag.Parse()
+
 	cfg := *cfgFlag
+
 	var err error
+
 	conf, err = configuration.GetConfig(cfg)
 	if err != nil {
 		log.Fatal("config read error: ", err)
+
 		return
 	}
 
 	configuration.SetEnvironmentVariables(&conf)
+
 	logger, err := gostLog.InitializeLogger(file, conf.Logger.FileName, &log.TextFormatter{FullTimestamp: true}, conf.Logger.Verbose)
 	if err != nil {
 		log.Println("Error initializing logger, defaulting to stdout. Error: " + err.Error())
@@ -52,8 +56,10 @@ func initialize() {
 
 func main() {
 	initialize()
+
 	stop := make(chan os.Signal, 2)
 	signal.Notify(stop, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+
 	go func() {
 		<-stop
 		// mainLogger.Info("GOST stopped gracefully")

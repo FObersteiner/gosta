@@ -14,6 +14,7 @@ import (
 
 func observationParamFactory(values map[string]interface{}) (entities.Entity, error) {
 	o := &entities.Observation{}
+
 	for as, value := range values {
 		if as == asMappings[entities.EntityTypeObservation][observationResultTime] {
 			if value == nil {
@@ -28,23 +29,30 @@ func observationParamFactory(values map[string]interface{}) (entities.Entity, er
 		if value == nil {
 			continue
 		}
+
 		if as == asMappings[entities.EntityTypeObservation][observationID] {
 			o.ID = value
 		}
+
 		if as == asMappings[entities.EntityTypeObservation][observationPhenomenonTime] {
 			o.PhenomenonTime = value.(string)
 		}
+
 		if as == asMappings[entities.EntityTypeObservation][observationResult] {
 			o.Result = json.RawMessage(value.(string))
 		}
+
 		if as == asMappings[entities.EntityTypeObservation][observationValidTime] {
 			o.ValidTime = value.(string)
 		}
+
 		if as == asMappings[entities.EntityTypeObservation][observationResultQuality] {
 			o.ResultQuality = value.(string)
 		}
+
 		if as == asMappings[entities.EntityTypeObservation][observationParameters] {
 			t := value.(string)
+
 			parameterMap, err := JSONToMap(&t)
 			if err != nil {
 				return nil, err
@@ -65,6 +73,7 @@ func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) 
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Observation{}, nil, intID, qo)
+
 	observation, err := processObservation(gdb.Db, query, qi)
 	if err != nil {
 		return nil, err
@@ -77,6 +86,7 @@ func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) 
 func (gdb *GostDatabase) GetObservations(qo *odata.QueryOptions) ([]*entities.Observation, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Observation{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Observation{}, nil, nil, qo)
+
 	return processObservations(gdb.Db, query, qo, qi, countSQL)
 }
 
@@ -89,6 +99,7 @@ func (gdb *GostDatabase) GetObservationsByFeatureOfInterest(foiID interface{}, q
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Observation{}, &entities.FeatureOfInterest{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Observation{}, &entities.FeatureOfInterest{}, intID, qo)
+
 	return processObservations(gdb.Db, query, qo, qi, countSQL)
 }
 
@@ -101,6 +112,7 @@ func (gdb *GostDatabase) GetObservationsByDatastream(dataStreamID interface{}, q
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Observation{}, &entities.Datastream{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Observation{}, &entities.Datastream{}, intID, qo)
+
 	return processObservations(gdb.Db, query, qo, qi, countSQL)
 }
 
@@ -120,10 +132,11 @@ func processObservation(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.O
 func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string) ([]*entities.Observation, int, bool, error) {
 	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
-		return nil, 0, false, fmt.Errorf("Error executing query %v", err)
+		return nil, 0, false, fmt.Errorf("Error executing query %w", err)
 	}
 
 	o := make([]*entities.Observation, 0)
+
 	for _, d := range data {
 		entity := d.(*entities.Observation)
 		o = append(o, entity)
@@ -133,7 +146,7 @@ func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions, qi *Que
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, hasNext, fmt.Errorf("Error executing count %v", err)
+			return nil, 0, hasNext, fmt.Errorf("Error executing count %w", err)
 		}
 	}
 
@@ -161,15 +174,16 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 	fID := o.FeatureOfInterest.ID
 
 	json, _ := o.MarshalPostgresJSON()
-	obs := fmt.Sprintf("'%s'", string(json[:]))
+	obs := fmt.Sprintf("'%s'", string(json))
 	sql2 := fmt.Sprintf("INSERT INTO %s.observation (data, stream_id, featureofinterest_id) VALUES (%v, %v, %v) RETURNING id", gdb.Schema, obs, dID, fID)
 
 	err := gdb.Db.QueryRow(sql2).Scan(&oID)
 	if err != nil {
-		errString := fmt.Sprintf("%v", err.Error())
+		errString := err.Error()
 		if strings.Contains(errString, "violates foreign key constraint \"fk_datastream\"") {
 			return nil, gostErrors.NewBadRequestError(errors.New("Datastream does not exist"))
 		}
+
 		if strings.Contains(errString, "violates foreign key constraint \"fk_featureofinterest\"") {
 			return nil, gostErrors.NewBadRequestError(errors.New("FeatureOfInterest does not exist"))
 		}
@@ -194,8 +208,11 @@ func (gdb *GostDatabase) ObservationExists(id interface{}) bool {
 // PatchObservation updates a Observation in the database
 func (gdb *GostDatabase) PatchObservation(id interface{}, o *entities.Observation) (*entities.Observation, error) {
 	var err error
+
 	var ok bool
+
 	var intID int
+
 	updates := make(map[string]interface{})
 
 	if intID, ok = ToIntID(id); !ok || !gdb.ObservationExists(intID) {
@@ -229,7 +246,7 @@ func (gdb *GostDatabase) PatchObservation(id interface{}, o *entities.Observatio
 	}
 
 	json, _ := observation.MarshalPostgresJSON()
-	updates["data"] = string(json[:])
+	updates["data"] = string(json)
 
 	if err = gdb.updateEntityColumns("observation", updates, intID); err != nil {
 		return nil, err

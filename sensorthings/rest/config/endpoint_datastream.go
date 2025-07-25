@@ -15,7 +15,7 @@ func CreateDatastreamsEndpoint(externalURL string) *endpoint.Endpoint {
 		Name:       "Datastreams",
 		EntityType: entities.EntityTypeDatastream,
 		OutputInfo: true,
-		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Datastreams")),
+		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, "Datastreams"),
 		SupportedExpandParams: []string{
 			"thing",
 			"sensor",

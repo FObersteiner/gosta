@@ -56,6 +56,7 @@ func NewAPI(database models.Database, config configuration.Config, mqtt models.M
 	}
 	api.initRest()
 	api.Start()
+
 	return api
 }
 
@@ -64,6 +65,7 @@ func (a *APIv1) Start() {
 	eps := *a.GetEndpoints()
 	expandParams := map[string][]string{}
 	selectParams := map[string][]string{}
+
 	for _, e := range eps {
 		expandParams[e.GetName()] = e.GetSupportedExpandParams()
 		selectParams[e.GetName()] = e.GetSupportedSelectParams()
@@ -96,6 +98,7 @@ func (a *APIv1) GetVersionInfo() *models.VersionInfo {
 // GetBasePathInfo when navigating to the base resource path will return a JSON array of the available SensorThings resource endpoints.
 func (a *APIv1) GetBasePathInfo() *entities.ArrayResponse {
 	bpi := []models.Endpoint{}
+
 	ep := *a.GetEndpoints()
 	for _, e := range ep {
 		if e.ShowOutputInfo() {
@@ -141,13 +144,14 @@ func (a *APIv1) SetLinks(entity entities.Entity, qo *odata.QueryOptions) {
 	if qo != nil && qo.Ref != nil && bool(*qo.Ref) {
 		entity.SetSelfLink(a.config.GetExternalServerURI())
 		entity.SetID(nil)
-	} else if qo == nil || qo.Select == nil || len(qo.Select.SelectItems) == 0 { //no query options, set all links
+	} else if qo == nil || qo.Select == nil || len(qo.Select.SelectItems) == 0 { // no query options, set all links
 		entity.SetAllLinks(a.config.GetExternalServerURI())
 	}
 }
 
 // CreateNextLink creates the link to the next page with results
-//  incomingUrl is the url of the request excluding oData query params
+//
+//	incomingUrl is the url of the request excluding oData query params
 func (a *APIv1) CreateNextLink(incomingURL string, qo *odata.QueryOptions) string {
 	// do not create a nextLink when there is no top and skip given
 	if qo == nil || qo.Top == nil || qo.Skip == nil || (int(*qo.Top) == 0 && int(*qo.Skip) == 0) {
@@ -159,21 +163,27 @@ func (a *APIv1) CreateNextLink(incomingURL string, qo *odata.QueryOptions) strin
 	if qo.Filter != nil {
 		queryString = appendQueryPart(queryString, fmt.Sprintf("$filter=%s", url.QueryEscape(qo.RawFilter)))
 	}
+
 	if qo.Count != nil {
 		queryString = appendQueryPart(queryString, fmt.Sprintf("$count=%v", url.QueryEscape(fmt.Sprintf("%v", *qo.Count))))
 	}
+
 	if qo.Expand != nil {
 		queryString = appendQueryPart(queryString, fmt.Sprintf("$expand=%s", url.QueryEscape(fmt.Sprintf("%v", qo.RawExpand))))
 	}
+
 	if qo.OrderBy != nil {
 		queryString = appendQueryPart(queryString, fmt.Sprintf("$orderby=%s", url.QueryEscape(qo.RawOrderBy)))
 	}
+
 	if qo.Format != nil {
 		queryString = appendQueryPart(queryString, fmt.Sprintf("$format=%s", url.QueryEscape(fmt.Sprintf("%v", qo.Format))))
 	}
+
 	if qo.Top != nil {
 		queryString = appendQueryPart(queryString, fmt.Sprintf("$top=%v", url.QueryEscape(fmt.Sprintf("%v", *qo.Top))))
 	}
+
 	if qo.Skip != nil {
 		queryString = appendQueryPart(queryString, fmt.Sprintf("$skip=%v", url.QueryEscape(fmt.Sprintf("%v", int(*qo.Skip)+int(*qo.Top)))))
 	}
@@ -183,6 +193,7 @@ func (a *APIv1) CreateNextLink(incomingURL string, qo *odata.QueryOptions) strin
 
 func containsMandatoryParams(entity interface{}) (bool, []error) {
 	contains := false
+
 	var errors []error
 
 	if entity != nil {
@@ -226,7 +237,7 @@ func (a *APIv1) createArrayResponse(count int, hasNext bool, path string, qo *od
 		ar.NextLink = a.CreateNextLink(path, qo)
 	}
 
-	if qo != nil && qo.Count != nil && bool(*qo.Count) == true {
+	if qo != nil && qo.Count != nil && bool(*qo.Count) {
 		ar.Count = count
 	}
 

@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -20,7 +19,7 @@ func CreateRouter(api *models.API) *mux.Router {
 	for _, e := range eps {
 		op := e
 		operation := op.Operation
-		method := fmt.Sprintf("%s", operation.OperationType)
+		method := string(operation.OperationType)
 		router.Methods(method).
 			Path(operation.Path).
 			HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

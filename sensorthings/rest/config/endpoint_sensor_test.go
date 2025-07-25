@@ -11,6 +11,6 @@ func TestGetEndPointSensor(t *testing.T) {
 	ep.Name = "yo"
 
 	// assert
-	assert.True(t, ep != nil)
-	assert.True(t, ep.GetName() == "yo")
+	assert.NotEqual(t, ep, nil)
+	assert.Equal(t, ep.GetName(), "yo")
 }

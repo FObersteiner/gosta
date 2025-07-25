@@ -11,5 +11,5 @@ func TestGetEndPointVersion(t *testing.T) {
 	ep.Name = "yo"
 
 	// assert
-	assert.True(t, ep.GetName() == "yo")
+	assert.Equal(t, ep.GetName(), "yo")
 }

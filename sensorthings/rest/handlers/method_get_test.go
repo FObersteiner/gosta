@@ -50,6 +50,7 @@ func TestHandleGetTestOk(t *testing.T) {
 	rr := httptest.NewRecorder()
 	req, _ := http.NewRequest("PATCH", "/bla", nil)
 	req.Header.Set("Content-Type", "application/json")
+
 	handle := func(q *odata.QueryOptions, path string) (interface{}, error) { return testHandlerGet() }
 
 	// act

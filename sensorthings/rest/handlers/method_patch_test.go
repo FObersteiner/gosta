@@ -24,6 +24,7 @@ func TestHandlePatchTestWithWrongDataType(t *testing.T) {
 	thing := &entities.Thing{}
 	req, _ := http.NewRequest("PATCH", "/bla", nil)
 	req.Header.Set("Content-Type", "this is an invalid content-type")
+
 	handle := func() (interface{}, error) { return testHandlerPatch() }
 
 	// act
@@ -39,6 +40,7 @@ func TestHandlePatchTestWithNoBody(t *testing.T) {
 	thing := &entities.Thing{}
 	req, _ := http.NewRequest("PATCH", "/bla", nil)
 	req.Header.Set("Content-Type", "application/json")
+
 	handle := func() (interface{}, error) { return testHandlerPatch() }
 
 	// act
@@ -54,6 +56,7 @@ func TestHandlePatchTestWithWrongBody(t *testing.T) {
 	thing := &entities.Thing{}
 	req, _ := http.NewRequest("PATCH", "/bla", bytes.NewReader([]byte("{\"name\": 10}")))
 	req.Header.Set("Content-Type", "application/json")
+
 	handle := func() (interface{}, error) { return testHandlerPatch() }
 
 	// act
@@ -69,6 +72,7 @@ func TestHandlePatchTestWithPutError(t *testing.T) {
 	thing := &entities.Thing{}
 	req, _ := http.NewRequest("PATCH", "/bla", bytes.NewReader([]byte("{\"name\": \"thing1\", \"description\": \"test thing 1\"}")))
 	req.Header.Set("Content-Type", "application/json")
+
 	handle := func() (interface{}, error) { return testHandlerPatchError() }
 
 	// act
@@ -86,6 +90,7 @@ func TestHandlePatchTestWithGoodBody(t *testing.T) {
 	thing.ID = 1
 	req, _ := http.NewRequest("PATCH", "/bla", bytes.NewReader([]byte("{\"@iot.id\": 1, \"name\": \"thing1\", \"description\": \"test thing 1\"}")))
 	req.Header.Set("Content-Type", "application/json")
+
 	handle := func() (interface{}, error) { return testHandlerPatch() }
 
 	// act

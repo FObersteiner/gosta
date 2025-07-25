@@ -15,7 +15,7 @@ func CreateLocationsEndpoint(externalURL string) *endpoint.Endpoint {
 		Name:       "Locations",
 		EntityType: entities.EntityTypeLocation,
 		OutputInfo: true,
-		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Locations")),
+		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, "Locations"),
 		SupportedExpandParams: []string{
 			"things",
 			"historicallocations",

@@ -148,6 +148,7 @@ func (q *QueryParseInfo) Init(entityType entities.EntityType, queryIndex int, pa
 	q.AsPrefix = asPrefixArr[queryIndex]
 	q.QueryIndex = queryIndex
 	q.ExpandItem = expandItem
+
 	switch e := entityType; e {
 	case entities.EntityTypeThing:
 		q.Entity = &entities.Thing{}
@@ -184,6 +185,7 @@ func (q *QueryParseInfo) GetParent(etl []entities.EntityType) *QueryParseInfo {
 
 	cq := q
 	path := ""
+
 	if len(etl) > 1 {
 		for i, e := range etl {
 			if i+1 == len(etl) {
@@ -191,7 +193,7 @@ func (q *QueryParseInfo) GetParent(etl []entities.EntityType) *QueryParseInfo {
 			}
 
 			if i == 0 {
-				path = fmt.Sprintf("%v", e.ToString())
+				path = e.ToString()
 			} else {
 				path = fmt.Sprintf("%v/%v", path, e.ToString())
 			}
@@ -203,6 +205,7 @@ func (q *QueryParseInfo) GetParent(etl []entities.EntityType) *QueryParseInfo {
 		for _, se := range q.SubEntities {
 			if se.getPath("") == p {
 				cq = se
+
 				break
 			}
 		}
@@ -214,9 +217,10 @@ func (q *QueryParseInfo) GetParent(etl []entities.EntityType) *QueryParseInfo {
 // QueryInfoExists checks if there is already a QueryParseInfo added based on the entity list
 func (q *QueryParseInfo) QueryInfoExists(etl []entities.EntityType) (bool, *QueryParseInfo) {
 	path := ""
+
 	for i, e := range etl {
 		if i == 0 {
-			path = fmt.Sprintf("%v", e.ToString())
+			path = e.ToString()
 		} else {
 			path = fmt.Sprintf("%v/%v", path, e.ToString())
 		}
@@ -280,6 +284,7 @@ func (q *QueryParseInfo) GetNextQueryIndex() int {
 	qpi := q.GetMainQueryParseInfo()
 
 	qi := qpi.QueryIndex
+
 	if len(qpi.SubEntities) > 0 {
 		lastSub := qpi.SubEntities[len(qpi.SubEntities)-1]
 		qi = lastSub.getNextQueryIndex() - 1
@@ -291,6 +296,7 @@ func (q *QueryParseInfo) GetNextQueryIndex() int {
 // GetNextQueryIndex returns the next query index number based on the added entities/sub entities
 func (q *QueryParseInfo) getNextQueryIndex() int {
 	qi := q.QueryIndex
+
 	if len(q.SubEntities) > 0 {
 		lastSub := q.SubEntities[len(q.SubEntities)-1]
 		qi = lastSub.GetNextQueryIndex() - 1
@@ -564,32 +570,26 @@ func getJoin(tableMap map[entities.EntityType]string, get entities.EntityType, b
 	case entities.EntityTypeLocation: // get Location by ...
 		{
 			return getJoinLocation(tableMap, by, asPrefix)
-
 		}
 	case entities.EntityTypeHistoricalLocation: // get HistoricalLocation by ... //fmt.Sprintf("%s WHERE %s.%s = %v", queryString, tableMappings[et2], asMappings[et2][idField], id)
 		{
 			return getJoinHistoricalLocation(tableMap, by, asPrefix)
-
 		}
 	case entities.EntityTypeSensor: // get sensor by ...
 		{
 			return getJoinSensor(tableMap, by, asPrefix)
-
 		}
 	case entities.EntityTypeObservedProperty: // get observed property by ...
 		{
 			return getJoinObservedProperty(tableMap, by, asPrefix)
-
 		}
 	case entities.EntityTypeObservation: // get observation by ...
 		{
 			return getJoinObservations(tableMap, by, asPrefix)
-
 		}
 	case entities.EntityTypeFeatureOfInterest: // get feature of interest by ...
 		{
 			return getJoinFeatureOfInterest(tableMap, by, asPrefix)
-
 		}
 	case entities.EntityTypeDatastream: // get Datastream by ...
 		{
@@ -718,16 +718,13 @@ func getJoinFeatureOfInterest(tableMap map[entities.EntityType]string, by entiti
 
 func getJoinByID(tableMap map[entities.EntityType]string, get entities.EntityType, by entities.EntityType, id interface{}) string {
 	switch get {
-
 	case entities.EntityTypeHistoricalLocation: // get HistoricalLocation by ... //fmt.Sprintf("%s WHERE %s.%s = %v", queryString, tableMappings[et2], asMappings[et2][idField], id)
 		{
 			return getJoinHistoricalLocationByID(tableMap, by, id)
-
 		}
 	case entities.EntityTypeObservation: // get observation by ...
 		{
 			return getJoinObservationsByID(tableMap, by, id)
-
 		}
 	case entities.EntityTypeDatastream: // get Datastream by ...
 		{
@@ -783,7 +780,7 @@ func createWhereIs(et entities.EntityType, field string, asPrefix string) string
 
 func createTableMappings(schema string) map[entities.EntityType]string {
 	if len(schema) > 0 {
-		schema = fmt.Sprintf("%s.", schema)
+		schema = schema + "."
 	}
 
 	tables := map[entities.EntityType]string{

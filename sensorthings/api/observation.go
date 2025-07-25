@@ -19,24 +19,28 @@ func (a *APIv1) GetObservation(id interface{}, qo *odata.QueryOptions, path stri
 	}
 
 	a.SetLinks(o, qo)
+
 	return o, nil
 }
 
 // GetObservations return all observations by given QueryOptions
 func (a *APIv1) GetObservations(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	observations, count, hasNext, err := a.db.GetObservations(qo)
+
 	return processObservations(a, observations, qo, path, count, hasNext, err)
 }
 
 // GetObservationsByFeatureOfInterest returns all observation by given FeatureOfInterest end QueryOptions
 func (a *APIv1) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	observations, count, hasNext, err := a.db.GetObservationsByFeatureOfInterest(foiID, qo)
+
 	return processObservations(a, observations, qo, path, count, hasNext, err)
 }
 
 // GetObservationsByDatastream returns all observations by given Datastream and QueryOptions
 func (a *APIv1) GetObservationsByDatastream(datastreamID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	observations, count, hasNext, err := a.db.GetObservationsByDatastream(datastreamID, qo)
+
 	return processObservations(a, observations, qo, path, count, hasNext, err)
 }
 
@@ -52,6 +56,7 @@ func processObservations(a *APIv1, observations []*entities.Observation, qo *oda
 	}
 
 	var data interface{} = observations
+
 	return a.createArrayResponse(count, hasNext, path, qo, data), nil
 }
 
@@ -63,6 +68,7 @@ func ConvertLocationToFoi(l *entities.Location) *entities.FeatureOfInterest {
 	foi.EncodingType = l.EncodingType
 	foi.Feature = l.Location
 	foi.OriginalLocationID = l.ID
+
 	return foi
 }
 
@@ -70,8 +76,11 @@ func ConvertLocationToFoi(l *entities.Location) *entities.FeatureOfInterest {
 // exist, returns only the existing FeatureOfInterest ID
 func CopyLocationToFoi(gdb *models.Database, datastreamID interface{}) (string, error) {
 	db := *gdb
+
 	var result string
+
 	var l *entities.Location
+
 	var err error
 
 	if l, err = db.GetLocationByDatastreamID(datastreamID, nil); err != nil || l == nil {
@@ -85,10 +94,12 @@ func CopyLocationToFoi(gdb *models.Database, datastreamID interface{}) (string, 
 	if featureOfInterestID == nil {
 		// if the FeatureOfInterest does not exist already, create it now
 		NewFeatureOfInterest := ConvertLocationToFoi(l)
+
 		CreatedFeatureOfInterest, err := db.PostFeatureOfInterest(NewFeatureOfInterest)
 		if err != nil {
 			return "", err
 		}
+
 		result = toStringID(CreatedFeatureOfInterest.ID)
 	} else {
 		result = toStringID(featureOfInterestID)
@@ -112,6 +123,7 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 
 		if err != nil {
 			errorMessage := "Missing Observation.FeatureOfInterest. Unable to create it from the Location: "
+
 			return nil, []error{gostErrors.NewBadRequestError(errors.New(errorMessage + err.Error()))}
 		}
 
@@ -119,9 +131,11 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 		observation.FeatureOfInterest.ID = foiID
 	} else if observation.FeatureOfInterest != nil && observation.FeatureOfInterest.ID == nil {
 		var foi *entities.FeatureOfInterest
+
 		if foi, err = a.PostFeatureOfInterest(observation.FeatureOfInterest); err != nil {
 			return nil, []error{gostErrors.NewConflictRequestError(errors.New("Unable to create deep inserted FeatureOfInterest"))}
 		}
+
 		observation.FeatureOfInterest = foi
 	}
 
@@ -163,6 +177,7 @@ func (a *APIv1) PostObservationByDatastream(datastreamID interface{}, observatio
 	d := &entities.Datastream{}
 	d.ID = datastreamID
 	observation.Datastream = d
+
 	return a.PostObservation(observation)
 }
 
@@ -181,6 +196,7 @@ func (a *APIv1) PutObservation(id interface{}, observation *entities.Observation
 	if err2 != nil {
 		return nil, []error{err2}
 	}
+
 	return obs, nil
 }
 

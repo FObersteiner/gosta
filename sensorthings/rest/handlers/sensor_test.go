@@ -73,7 +73,7 @@ func parseAndAssertSensor(created entities.Sensor, r *http.Response, expectedSta
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &sensor)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assertStatusCode(expectedStatusCode, r, t)
 	assertSensor(created, sensor, t)
 }
@@ -94,7 +94,7 @@ func getAndAssertSensors(url string, t *testing.T) {
 	err = json.Unmarshal(body, &ar)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assertStatusCode(http.StatusOK, r, t)
 	assert.Equal(t, 2, ar.Count)
 

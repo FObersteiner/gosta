@@ -2,11 +2,9 @@ package reader
 
 import (
 	"errors"
+	"io"
 	"net/http"
 	"strings"
-
-	"fmt"
-	"io/ioutil"
 
 	"github.com/gorilla/mux"
 	entities "github.com/gost/core"
@@ -20,6 +18,7 @@ func GetEntityID(r *http.Request) string {
 	vars := mux.Vars(r)
 	value := vars["id"]
 	substring := value[1 : len(value)-1]
+
 	return substring
 }
 
@@ -30,6 +29,7 @@ func CheckContentType(w http.ResponseWriter, r *http.Request, indentJSON bool) b
 	if len(r.Header.Get("Content-Type")) > 0 {
 		if !strings.Contains(r.Header.Get("Content-Type"), "application/json") {
 			writer.SendError(w, []error{gostErrors.NewBadRequestError(errors.New("Missing or wrong Content-Type, accepting: application/json"))}, indentJSON)
+
 			return false
 		}
 	}
@@ -41,11 +41,13 @@ func CheckContentType(w http.ResponseWriter, r *http.Request, indentJSON bool) b
 // when an error occurs an error will be send back using the ResponseWriter
 func CheckAndGetBody(w http.ResponseWriter, r *http.Request, indentJSON bool) []byte {
 	if r.Body == nil {
-		writer.SendError(w, []error{gostErrors.NewBadRequestError(fmt.Errorf("No body found in request"))}, indentJSON)
+		writer.SendError(w, []error{gostErrors.NewBadRequestError(errors.New("No body found in request"))}, indentJSON)
+
 		return nil
 	}
 
-	byteData, _ := ioutil.ReadAll(r.Body)
+	byteData, _ := io.ReadAll(r.Body)
+
 	return byteData
 }
 
@@ -55,7 +57,6 @@ func ParseEntity(entity entities.Entity, data []byte) error {
 	var err error
 
 	err = entity.ParseEntity(data)
-
 	if err != nil {
 		err = gostErrors.NewBadRequestError(err)
 	}

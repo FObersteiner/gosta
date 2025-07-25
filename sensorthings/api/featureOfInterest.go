@@ -16,6 +16,7 @@ func (a *APIv1) GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions, pat
 	}
 
 	a.SetLinks(l, qo)
+
 	return l, nil
 }
 
@@ -27,12 +28,14 @@ func (a *APIv1) GetFeatureOfInterestByObservation(id interface{}, qo *odata.Quer
 	}
 
 	a.SetLinks(l, qo)
+
 	return l, nil
 }
 
 // GetFeatureOfInterests return FeaturesOfInterest based on the given QueryOptions
 func (a *APIv1) GetFeatureOfInterests(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	fois, count, hasNext, err := a.db.GetFeatureOfInterests(qo)
+
 	return processFeatureOfInterest(a, fois, qo, path, count, hasNext, err)
 }
 
@@ -44,6 +47,7 @@ func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *
 	}
 
 	var data interface{} = fois
+
 	return a.createArrayResponse(count, hasNext, path, qo, data), nil
 }
 
@@ -56,6 +60,7 @@ func (a *APIv1) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entitie
 
 	if foi.EncodingType != entities.EncodingGeoJSON.Value {
 		err := errors.New("Encoding not supported. Supported encoding: " + entities.EncodingGeoJSON.Value)
+
 		return nil, []error{err}
 	}
 
@@ -65,6 +70,7 @@ func (a *APIv1) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entitie
 	}
 
 	l.SetAllLinks(a.config.GetExternalServerURI())
+
 	return l, nil
 }
 
@@ -81,6 +87,7 @@ func (a *APIv1) PutFeatureOfInterest(id interface{}, foi *entities.FeatureOfInte
 	}
 
 	l.SetAllLinks(a.config.GetExternalServerURI())
+
 	return l, nil
 }
 
@@ -93,6 +100,7 @@ func (a *APIv1) PatchFeatureOfInterest(id interface{}, foi *entities.FeatureOfIn
 	if len(foi.EncodingType) != 0 {
 		if foi.EncodingType != entities.EncodingGeoJSON.Value {
 			err := errors.New("Encoding not supported. Supported encoding: " + entities.EncodingGeoJSON.Value)
+
 			return nil, err
 		}
 

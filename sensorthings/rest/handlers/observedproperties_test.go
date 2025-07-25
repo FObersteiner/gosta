@@ -73,7 +73,7 @@ func parseAndAssertObservedProperty(created entities.ObservedProperty, r *http.R
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &observedProperty)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assertStatusCode(expectedStatusCode, r, t)
 	assertObservedProperty(created, observedProperty, t)
 }
@@ -92,7 +92,7 @@ func getAndAssertObservedProperties(url string, t *testing.T) {
 	err = json.Unmarshal(body, &ar)
 
 	// assert
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assertStatusCode(http.StatusOK, r, t)
 	assert.Equal(t, 2, ar.Count)
 

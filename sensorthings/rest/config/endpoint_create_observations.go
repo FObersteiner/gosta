@@ -13,7 +13,7 @@ func CreateCreateObservationsEndpoint(externalURL string) *endpoint.Endpoint {
 	return &endpoint.Endpoint{
 		Name:       "CreateObservations",
 		OutputInfo: false,
-		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "CreateObservations")),
+		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, "CreateObservations"),
 		Operations: []models.EndpointOperation{
 			{OperationType: models.HTTPOperationPost, Path: "/v1.0/createobservations", Handler: handlers.HandlePostCreateObservations},
 		},

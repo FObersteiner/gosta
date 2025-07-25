@@ -19,7 +19,7 @@ func TestObservationParamFactory(t *testing.T) {
 		"observation_resulttime":     resultTime,
 		"observation_resultquality":  "goed",
 		"observation_validtime":      validTime,
-		//"observation_parameters": "test",
+		// "observation_parameters": "test",
 	}
 
 	// act
@@ -28,10 +28,10 @@ func TestObservationParamFactory(t *testing.T) {
 	// todo: how to get the observation??
 
 	// assert
-	assert.True(t, entity != nil)
+	assert.NotEqual(t, entity, nil)
 	// entities..
-	assert.True(t, err == nil)
-	assert.True(t, entity.GetID() == 4)
-	assert.True(t, entitytype == entities.EntityTypeObservation)
+	assert.Equal(t, err, nil)
+	assert.Equal(t, entity.GetID(), 4)
+	assert.Equal(t, entitytype, entities.EntityTypeObservation)
 	// assert.True(t,*observation.ResultTime == resultTime)
 }

@@ -195,7 +195,7 @@ type Database interface {
 type MQTTClient interface {
 	Start(*API)
 	Stop()
-	Publish(string, string, byte) //topic, message, qos
+	Publish(string, string, byte) // topic, message, qos
 }
 
 // Endpoint defines the rest endpoint options
@@ -214,7 +214,7 @@ type HTTPHandler func(w http.ResponseWriter, r *http.Request, e *Endpoint, a *AP
 // EndpointOperation contains the needed information to create an endpoint in the HTTP.Router
 type EndpointOperation struct {
 	OperationType HTTPOperation
-	Path          string //relative path to the endpoint for example: /v1.0/myendpoint/
+	Path          string // relative path to the endpoint for example: /v1.0/myendpoint/
 	Handler       HTTPHandler
 }
 

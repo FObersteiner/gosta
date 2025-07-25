@@ -23,13 +23,16 @@ func handlePatchRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reque
 	err := reader.ParseEntity(entity, byteData)
 	if err != nil {
 		writer.SendError(w, []error{err}, indentJSON)
+
 		return
 	}
 
 	handle := *h
+
 	data, err2 := handle()
 	if err2 != nil {
 		writer.SendError(w, []error{err2}, indentJSON)
+
 		return
 	}
 

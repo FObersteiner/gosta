@@ -18,9 +18,9 @@ func TestExpandParametersSupported(t *testing.T) {
 	SupportedExpandParameters = map[string][]string{"things": {"locations", "datastreams"}}
 
 	// assert
-	assert.Equal(t, true, qo.ExpandParametersSupported("things", "locations"))
-	assert.Equal(t, false, qo.ExpandParametersSupported("things", "featuresofinterest"))
-	assert.Equal(t, false, qo.ExpandParametersSupported("bla", ""))
+	assert.True(t, qo.ExpandParametersSupported("things", "locations"))
+	assert.False(t, qo.ExpandParametersSupported("things", "featuresofinterest"))
+	assert.False(t, qo.ExpandParametersSupported("bla", ""))
 }
 
 func TestSelectParametersSupported(t *testing.T) {
@@ -29,9 +29,9 @@ func TestSelectParametersSupported(t *testing.T) {
 	SupportedSelectParameters = map[string][]string{"things": {"id", "name"}}
 
 	// assert
-	assert.Equal(t, true, qo.SelectParametersSupported("things", "name"))
-	assert.Equal(t, false, qo.SelectParametersSupported("things", "nonexistingparam"))
-	assert.Equal(t, false, qo.SelectParametersSupported("bla", ""))
+	assert.True(t, qo.SelectParametersSupported("things", "name"))
+	assert.False(t, qo.SelectParametersSupported("things", "nonexistingparam"))
+	assert.False(t, qo.SelectParametersSupported("bla", ""))
 }
 
 func TestEmptyQuery(t *testing.T) {
@@ -64,7 +64,7 @@ func TestParseFilter(t *testing.T) {
 	query, err := ParseURLQuery(uri.Query())
 
 	// assert
-	assert.NotNil(t, query, fmt.Sprintf("%v", err))
+	assert.NotNil(t, query, "%v", err)
 	assert.NotNil(t, query.Filter)
 	assert.NotNil(t, query.Count)
 	assert.NotNil(t, query.Expand)
@@ -141,7 +141,7 @@ func TestGetQueryOptions(t *testing.T) {
 	qo, _ := GetQueryOptions(req, 20)
 
 	// assert
-	assert.True(t, qo != nil)
+	assert.NotEqual(t, qo, nil)
 }
 
 func TestReturnNoQueryOptionsOnFailedParse(t *testing.T) {
@@ -161,7 +161,7 @@ func TestReadRefFromWildcard(t *testing.T) {
 	router := mux.NewRouter()
 	router.HandleFunc("/v1.0/Things{id}/{params}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		qo, _ := GetQueryOptions(r, 20)
-		w.Write([]byte(fmt.Sprintf("%v", *qo.Ref)))
+		fmt.Fprintf(w, "%v", *qo.Ref)
 	}))
 
 	ts := httptest.NewServer(router)
@@ -171,9 +171,9 @@ func TestReadRefFromWildcard(t *testing.T) {
 	resp, _ := http.Get(ts.URL + "/v1.0/Things(35)/$ref")
 
 	// assert
-	assert.True(t, resp != nil)
-	assert.True(t, http.StatusOK == resp.StatusCode)
+	assert.NotEqual(t, resp, nil)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	body := resp.Body
 	result, _ := ioutil.ReadAll(body)
-	assert.True(t, string(result) == "true")
+	assert.Equal(t, string(result), "true")
 }

@@ -30,12 +30,12 @@ func TestGetInstanceWithoutInitialization(t *testing.T) {
 }
 
 func TestLoggerLifecycle(t *testing.T) {
-	//Setup
+	// Setup
 	testLogger, err = InitializeLogger(testFile, testLogFileName, new(log.TextFormatter), testVerboseFlag)
 	assert.NoError(t, err, "Initialization error should be nil")
 	assert.NotNil(t, testLogger, "Logger must have been initialized")
 
-	//GetInstance
+	// GetInstance
 	loggerInstance, err := GetLoggerInstance()
 	assert.NoError(t, err, "GetInstance should not return error")
 	assert.NotNil(t, loggerInstance, "Logger instance should not be nil")
@@ -43,10 +43,11 @@ func TestLoggerLifecycle(t *testing.T) {
 	loggerInstance.Info("Info")
 	loggerInstance.Warn("Warn")
 	loggerInstance.Error("Error")
+
 	_, err = os.Stat("./" + testLogFileName + ".log")
 	assert.False(t, os.IsNotExist(err), "Test log file should exist")
 
-	//Cleanup
+	// Cleanup
 	CleanUp()
 	assert.Nil(t, testFile, "Test file should be Nil")
 }
@@ -62,7 +63,7 @@ func TestDebugWithElapsedTime(t *testing.T) {
 	f := func() { DebugWithElapsedTime(entry, time.Now(), "test") }
 	message := captureStdout(f)
 
-	//assert
+	// assert
 	assert.Contains(t, message, "elapsed")
 	assert.Contains(t, message, "test")
 }
@@ -74,7 +75,7 @@ func TestDebugfWithElapsedTime(t *testing.T) {
 	f := func() { DebugfWithElapsedTime(entry, time.Now(), "test %s", "1") }
 	message := captureStdout(f)
 
-	//assert
+	// assert
 	assert.Contains(t, message, "elapsed")
 	assert.Contains(t, message, "test 1")
 }
@@ -87,9 +88,12 @@ func captureStdout(f func()) string {
 	f()
 
 	w.Close()
+
 	testLogger.Out = old
 
 	var buf bytes.Buffer
+
 	io.Copy(&buf, r)
+
 	return buf.String()
 }

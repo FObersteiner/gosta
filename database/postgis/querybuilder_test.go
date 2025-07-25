@@ -19,25 +19,25 @@ func TestCreateQueryBuilder(t *testing.T) {
 
 func TestCreateFilter(t *testing.T) {
 	qb := CreateQueryBuilder("v1.0", 1)
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenOpenParen}}, false) == "")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenCloseParen}}, false) == "")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenWhitespace}}, false) == "")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenColon}}, false) == "")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenComma}}, false) == "")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenOp}}, false) == "")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenFunc}}, false) == "")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenLambda, Value: "ho"}}, false) == "ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenNull, Value: "ho"}}, false) == "ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenIt, Value: "ho"}}, false) == "ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenRoot, Value: "ho"}}, false) == "ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenFloat, Value: "ho"}}, false) == "ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenInteger, Value: "ho"}}, false) == "ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenString, Value: "ho"}}, false) == "ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenDate, Value: "ho"}}, false) == "ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenTime, Value: "ho"}}, false) == "ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenDateTime, Value: "ho"}}, false) == "ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenBoolean, Value: "ho"}}, false) == "ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenLiteral, Value: "ho"}}, false) == "ho")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenOpenParen}}, false), "")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenCloseParen}}, false), "")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenWhitespace}}, false), "")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenColon}}, false), "")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenComma}}, false), "")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenOp}}, false), "")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenFunc}}, false), "")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenLambda, Value: "ho"}}, false), "ho")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenNull, Value: "ho"}}, false), "ho")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenIt, Value: "ho"}}, false), "ho")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenRoot, Value: "ho"}}, false), "ho")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenFloat, Value: "ho"}}, false), "ho")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenInteger, Value: "ho"}}, false), "ho")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenString, Value: "ho"}}, false), "ho")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenDate, Value: "ho"}}, false), "ho")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenTime, Value: "ho"}}, false), "ho")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenDateTime, Value: "ho"}}, false), "ho")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenBoolean, Value: "ho"}}, false), "ho")
+	assert.Equal(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenLiteral, Value: "ho"}}, false), "ho")
 }
 
 func TestPrepareFilterRight(t *testing.T) {
@@ -64,7 +64,7 @@ func TestRemoveSchema(t *testing.T) {
 	// act
 	res := qb.removeSchema("v2.hallo")
 	// assert
-	assert.True(t, res == "hallo")
+	assert.Equal(t, res, "hallo")
 }
 
 func TestGetOffset(t *testing.T) {
@@ -77,7 +77,7 @@ func TestGetOffset(t *testing.T) {
 	offset := qb.getOffset(qo)
 
 	// assert
-	assert.True(t, offset == "2")
+	assert.Equal(t, offset, "2")
 }
 
 func TestRemoveSchemaWithoutSchema(t *testing.T) {
@@ -87,7 +87,7 @@ func TestRemoveSchemaWithoutSchema(t *testing.T) {
 	// act
 	res := qb.removeSchema("hallo")
 	// assert
-	assert.True(t, res == "hallo")
+	assert.Equal(t, res, "hallo")
 }
 
 func TestGetLimit(t *testing.T) {
@@ -98,7 +98,7 @@ func TestGetLimit(t *testing.T) {
 	// act
 	res := qb.getLimit(qo, 0)
 	// assert
-	assert.True(t, res == 1)
+	assert.Equal(t, res, 1)
 }
 
 func TestGetOrderByWithNilOptions(t *testing.T) {
@@ -110,7 +110,7 @@ func TestGetOrderByWithNilOptions(t *testing.T) {
 
 	// assert
 	assert.NotNil(t, res)
-	assert.True(t, res == "datastream.id DESC")
+	assert.Equal(t, res, "datastream.id DESC")
 }
 
 func TestCreateJoinWithExpand(t *testing.T) {
@@ -154,7 +154,7 @@ func TestGetOrderByWithQueryOptions(t *testing.T) {
 
 	// assert
 	assert.NotNil(t, res)
-	assert.True(t, res == "datastream.id asc, datastream.name desc")
+	assert.Equal(t, res, "datastream.id asc, datastream.name desc")
 }
 
 func TestGetLimitWithQueryTop(t *testing.T) {
@@ -167,21 +167,21 @@ func TestGetLimitWithQueryTop(t *testing.T) {
 	// act
 	res := qb.getLimit(qo, 0)
 	// assert
-	assert.True(t, res == 2)
+	assert.Equal(t, res, 2)
 }
 
 func TestOdataLogicalOperatorToPostgreSQL(t *testing.T) {
 	qb := CreateQueryBuilder("v1.0", 1)
-	assert.True(t, qb.odataLogicalOperatorToPostgreSQL("and") == "AND")
-	assert.True(t, qb.odataLogicalOperatorToPostgreSQL("or") == "OR")
-	assert.True(t, qb.odataLogicalOperatorToPostgreSQL("not") == "NOT")
-	assert.True(t, qb.odataLogicalOperatorToPostgreSQL("has") == "HAS")
-	assert.True(t, qb.odataLogicalOperatorToPostgreSQL("ne") == "!=")
-	assert.True(t, qb.odataLogicalOperatorToPostgreSQL("gt") == ">")
-	assert.True(t, qb.odataLogicalOperatorToPostgreSQL("ge") == ">=")
-	assert.True(t, qb.odataLogicalOperatorToPostgreSQL("lt") == "<")
-	assert.True(t, qb.odataLogicalOperatorToPostgreSQL("le") == "<=")
-	assert.True(t, qb.odataLogicalOperatorToPostgreSQL("ho") == "")
+	assert.Equal(t, qb.odataLogicalOperatorToPostgreSQL("and"), "AND")
+	assert.Equal(t, qb.odataLogicalOperatorToPostgreSQL("or"), "OR")
+	assert.Equal(t, qb.odataLogicalOperatorToPostgreSQL("not"), "NOT")
+	assert.Equal(t, qb.odataLogicalOperatorToPostgreSQL("has"), "HAS")
+	assert.Equal(t, qb.odataLogicalOperatorToPostgreSQL("ne"), "!=")
+	assert.Equal(t, qb.odataLogicalOperatorToPostgreSQL("gt"), ">")
+	assert.Equal(t, qb.odataLogicalOperatorToPostgreSQL("ge"), ">=")
+	assert.Equal(t, qb.odataLogicalOperatorToPostgreSQL("lt"), "<")
+	assert.Equal(t, qb.odataLogicalOperatorToPostgreSQL("le"), "<=")
+	assert.Equal(t, qb.odataLogicalOperatorToPostgreSQL("ho"), "")
 }
 
 func TestCreateCountQueryWithoutId(t *testing.T) {
@@ -228,7 +228,6 @@ func TestConstructQueryParseInfo(t *testing.T) {
 
 	// act
 	qb.constructQueryParseInfo(expandItems, qpi)
-
 	// assert
 }
 
@@ -275,7 +274,7 @@ func TestSortQueryOptionsScenario3(t *testing.T) {
 	qb.sortQueryOptions(qo)
 
 	// assert
-	assert.Equal(t, 0, len(qo.Filter.Tree.Children))
+	assert.Empty(t, qo.Filter.Tree.Children)
 
 	assert.Equal(t, "Locations", qo.Expand.ExpandItems[0].Path[0].Value)
 

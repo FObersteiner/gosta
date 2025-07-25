@@ -19,6 +19,7 @@ func (a *APIv1) GetThing(id interface{}, qo *odata.QueryOptions, path string) (*
 	}
 
 	a.SetLinks(t, qo)
+
 	return t, nil
 }
 
@@ -30,12 +31,14 @@ func (a *APIv1) GetThingByDatastream(id interface{}, qo *odata.QueryOptions, pat
 	}
 
 	a.SetLinks(t, qo)
+
 	return t, nil
 }
 
 // GetThingsByLocation returns things based on the given location id and QueryOptions
 func (a *APIv1) GetThingsByLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	things, count, hasNext, err := a.db.GetThingsByLocation(id, qo)
+
 	return processThings(a, things, qo, path, count, hasNext, err)
 }
 
@@ -47,12 +50,14 @@ func (a *APIv1) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOpti
 	}
 
 	a.SetLinks(t, qo)
+
 	return t, nil
 }
 
 // GetThings returns an array of thing entities based on the QueryOptions
 func (a *APIv1) GetThings(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	things, count, hasNext, err := a.db.GetThings(qo)
+
 	return processThings(a, things, qo, path, count, hasNext, err)
 }
 
@@ -68,6 +73,7 @@ func processThings(a *APIv1, things []*entities.Thing, qo *odata.QueryOptions, p
 	}
 
 	var data interface{} = things
+
 	return a.createArrayResponse(count, hasNext, path, qo, data), nil
 }
 
@@ -75,7 +81,9 @@ func processThings(a *APIv1, things []*entities.Thing, qo *odata.QueryOptions, p
 // a posted thing can also contain Locations and DataStreams
 func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 	var err []error
+
 	var err2 error
+
 	_, err = containsMandatoryParams(thing)
 	if len(err) > 0 {
 		return nil, err
@@ -87,25 +95,32 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 	}
 
 	var postedLocations []*entities.Location
+
 	var postedDatastreams []*entities.Datastream
 
 	// Handle deep insert locations
 	if thing.Locations != nil {
 		for _, l := range thing.Locations {
 			// New location posted
-			if l.ID == nil { //Id is null so a new location is posted
+			if l.ID == nil { // Id is null so a new location is posted
 				var nl *entities.Location
+
 				if nl, err = a.PostLocationByThing(nt.ID, l); len(err) > 0 {
 					a.reverseInserts(nt, postedLocations, postedDatastreams)
+
 					err = append(err, gostErrors.NewConflictRequestError(errors.New("Location deep insert went wrong")))
+
 					return nil, err
 				}
+
 				postedLocations = append(postedLocations, nl)
 			} else { // posted id: link
 				if err2 = a.LinkLocation(nt.ID, l.ID); len(err) > 0 {
 					a.reverseInserts(nt, postedLocations, postedDatastreams)
+
 					err = append(err, gostErrors.NewConflictRequestError(errors.New("Location linking went wrong")))
 					err = append(err, err2)
+
 					return nil, err
 				}
 
@@ -118,7 +133,9 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 
 				if _, err = a.PostHistoricalLocation(hl); len(err) > 0 {
 					a.reverseInserts(nt, postedLocations, postedDatastreams)
+
 					err = append(err, gostErrors.NewConflictRequestError(errors.New("Creating Historical Location went wrong")))
+
 					return nil, err
 				}
 			}
@@ -129,17 +146,23 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 	if thing.Datastreams != nil {
 		for _, d := range thing.Datastreams {
 			// New location posted
-			if d.ID == nil { //Id is null so a new datastream is posted
+			if d.ID == nil { // Id is null so a new datastream is posted
 				var nd *entities.Datastream
+
 				if nd, err = a.PostDatastreamByThing(nt.ID, d); err != nil {
 					a.reverseInserts(nt, postedLocations, postedDatastreams)
+
 					err = append(err, gostErrors.NewConflictRequestError(errors.New("Creating Datastrean went wrong")))
+
 					return nil, err
 				}
+
 				postedDatastreams = append(postedDatastreams, nd)
 			} else {
 				a.reverseInserts(nt, postedLocations, postedDatastreams)
+
 				err = append(err, gostErrors.NewConflictRequestError(errors.New("ID found for deep inserted datastream, linking to an existing Datastream is not allowed")))
+
 				return nil, err
 			}
 		}
@@ -147,7 +170,7 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 
 	nt.SetAllLinks(a.config.GetExternalServerURI())
 
-	//push to mqtt
+	// push to mqtt
 	a.sendOverMQTT(nt, "Things")
 
 	return nt, nil
@@ -182,12 +205,14 @@ func (a *APIv1) PatchThing(id interface{}, thing *entities.Thing) (*entities.Thi
 // PutThing updates the given thing in the database
 func (a *APIv1) PutThing(id interface{}, thing *entities.Thing) (*entities.Thing, []error) {
 	var err error
+
 	putthing, err := a.db.PutThing(id, thing)
 	if err != nil {
 		return nil, []error{err}
 	}
 
 	putthing.SetAllLinks(a.config.GetExternalServerURI())
+
 	return putthing, nil
 }
 

@@ -1,14 +1,14 @@
 package configuration
 
 import (
-	"io/ioutil"
+	"os"
 
 	"gopkg.in/yaml.v2"
 )
 
 // readFile reads the bytes from a given file
 func readFile(cfgFile string) ([]byte, error) {
-	source, err := ioutil.ReadFile(cfgFile)
+	source, err := os.ReadFile(cfgFile)
 	if err != nil {
 		return nil, err
 	}
@@ -20,6 +20,7 @@ func readFile(cfgFile string) ([]byte, error) {
 func readConfig(fileContent []byte) (Config, error) {
 	config := Config{}
 	err := yaml.Unmarshal(fileContent, &config)
+
 	return config, err
 }
 
@@ -37,5 +38,6 @@ func GetConfig(cfgFile string) (Config, error) {
 	}
 
 	CurrentConfig = conf
+
 	return CurrentConfig, nil
 }

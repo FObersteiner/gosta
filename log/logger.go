@@ -15,7 +15,7 @@ var (
 )
 
 var (
-	//ErrLoggerNotInitialized is thrown when uninitialized logger instance is requested
+	// ErrLoggerNotInitialized is thrown when uninitialized logger instance is requested
 	ErrLoggerNotInitialized = errors.New("LoggerNotInitialized")
 )
 
@@ -31,6 +31,7 @@ func GetLoggerInstance() (*log.Logger, error) {
 // InitializeLogger with various properties
 func InitializeLogger(file *os.File, logFileName string, format log.Formatter, verboseFlag bool) (*log.Logger, error) {
 	var err error
+
 	gostLogger = log.New()
 	gostFile = file
 

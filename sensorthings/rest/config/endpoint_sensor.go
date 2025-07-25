@@ -15,7 +15,7 @@ func CreateSensorsEndpoint(externalURL string) *endpoint.Endpoint {
 		Name:       "Sensors",
 		EntityType: entities.EntityTypeSensor,
 		OutputInfo: true,
-		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Sensors")),
+		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, "Sensors"),
 		SupportedExpandParams: []string{
 			"datastreams",
 		},

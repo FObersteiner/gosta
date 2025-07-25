@@ -15,7 +15,7 @@ func CreateFeaturesOfInterestEndpoint(externalURL string) *endpoint.Endpoint {
 		Name:       "FeaturesOfInterest",
 		EntityType: entities.EntityTypeFeatureOfInterest,
 		OutputInfo: true,
-		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "FeaturesOfInterest")),
+		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, "FeaturesOfInterest"),
 		SupportedExpandParams: []string{
 			"observations",
 		},

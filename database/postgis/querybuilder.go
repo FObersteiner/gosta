@@ -2,6 +2,7 @@ package postgis
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -38,6 +39,7 @@ func (qb *QueryBuilder) removeSchema(table string) string {
 	if i == -1 {
 		return table
 	}
+
 	return table[i+1:]
 }
 
@@ -48,6 +50,7 @@ func (qb *QueryBuilder) getLimit(qo *odata.QueryOptions, extra int) int {
 	if qo != nil && qo.Top != nil {
 		return int(*qo.Top) + extra
 	}
+
 	return qb.maxTop + extra
 }
 
@@ -57,6 +60,7 @@ func (qb *QueryBuilder) getOffset(qo *odata.QueryOptions) string {
 	if qo != nil && qo.Skip != nil {
 		return fmt.Sprintf("%v", *qo.Skip)
 	}
+
 	return "0"
 }
 
@@ -65,6 +69,7 @@ func (qb *QueryBuilder) getOffset(qo *odata.QueryOptions) string {
 func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOptions, fromAs bool) string {
 	if qo != nil && qo.OrderBy != nil && len(qo.OrderBy.OrderByItems) > 0 {
 		obString := ""
+
 		for _, obi := range qo.OrderBy.OrderByItems {
 			propertyName := strings.ToLower(obi.Field.Value)
 			propertyName = qb.changeLocationField(propertyName)
@@ -86,10 +91,10 @@ func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOption
 	}
 
 	if fromAs {
-		return fmt.Sprintf("%s DESC", asMappings[et][idField])
+		return asMappings[et][idField] + " DESC"
 	}
 
-	return fmt.Sprintf("%s DESC", selectMappings[et][idField])
+	return selectMappings[et][idField] + " DESC"
 }
 
 // if location or feature is requested get the geojson field
@@ -142,6 +147,7 @@ func (qb *QueryBuilder) getProperties(et entities.Entity, qo *odata.QueryOptions
 		properties = et.GetPropertyNames()
 	} else {
 		idAdded := false
+
 		for _, p := range qo.Select.SelectItems {
 			for _, s := range p.Segments {
 				if s.Value == idField {
@@ -150,7 +156,7 @@ func (qb *QueryBuilder) getProperties(et entities.Entity, qo *odata.QueryOptions
 			}
 
 			for _, pn := range et.GetPropertyNames() {
-				if strings.ToLower(p.Segments[0].Value) == strings.ToLower(pn) {
+				if strings.EqualFold(p.Segments[0].Value, pn) {
 					if p.Segments[0].Value == idField {
 						properties = append([]string{idField}, properties...)
 					} else {
@@ -159,6 +165,7 @@ func (qb *QueryBuilder) getProperties(et entities.Entity, qo *odata.QueryOptions
 				}
 			}
 		}
+
 		if addID && !idAdded {
 			properties = append([]string{"id"}, properties...)
 		}
@@ -243,6 +250,7 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, id in
 		et2 := e2.GetEntityType()
 
 		asPrefix := ""
+
 		if qpi != nil {
 			if qpi.Parent != nil {
 				asPrefix = qpi.Parent.AsPrefix
@@ -255,6 +263,7 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, id in
 			join := getJoin(qb.tables, et2, e1.GetEntityType(), asPrefix)
 			lowerJoin := strings.ToLower(join)
 			filterPrefix := "WHERE"
+
 			if strings.Contains(lowerJoin, "where") {
 				filterPrefix = "AND"
 			}
@@ -302,7 +311,7 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, id in
 			// supply qo to createJoin as a non Expand
 			generatedExpand := isExpandGenerated(qo.Select)
 			if !generatedExpand {
-				//qo.Select = &godata.GoDataSelectQuery{}
+				// qo.Select = &godata.GoDataSelectQuery{}
 			}
 
 			joinString = qb.createJoin(subQPI.Parent.Entity, subQPI.Entity, nil, true, innerjoinExpand, qo, subQPI, joinString)
@@ -324,8 +333,10 @@ func (qb *QueryBuilder) createSelectByRelationString(e1 entities.Entity, e2 enti
 
 	nqo := &odata.QueryOptions{}
 	nqo.Select = &godata.GoDataSelectQuery{SelectItems: []*godata.SelectItem{{Segments: []*godata.Token{{Value: "id"}}}}}
+
 	if id != nil {
 		var err error
+
 		nqo.Filter, err = godata.ParseFilterString(fmt.Sprintf("id eq %v", id))
 		if err != nil {
 			fmt.Printf("\n\n ERROR %v \n\n", err)
@@ -335,6 +346,7 @@ func (qb *QueryBuilder) createSelectByRelationString(e1 entities.Entity, e2 enti
 	join := getJoin(qb.tables, et2, e1.GetEntityType(), "")
 	lowerJoin := strings.ToLower(join)
 	filterPrefix := "WHERE"
+
 	if strings.Contains(lowerJoin, "where") {
 		filterPrefix = "AND"
 	}
@@ -370,12 +382,13 @@ func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem,
 			et, _ := entities.EntityFromString(strings.ToLower(t.Value))
 			path := make([]entities.EntityType, 0)
 
-			for p := 0; p < i+1; p++ {
+			for p := range i + 1 {
 				etfs, _ := entities.EntityFromString(o.Path[p].Value)
 				path = append(path, etfs.GetEntityType())
 			}
 
 			parent := main.GetParent(path)
+
 			exist, qi := main.QueryInfoExists(path)
 			if exist {
 				if i == len(o.Path)-1 {
@@ -384,7 +397,6 @@ func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem,
 							Filter: o.Filter,
 						}
 					} else if qi.ExpandItem.Filter != nil && qi.ExpandItem.Filter.Tree != nil {
-
 						temp := &godata.ParseNode{}
 						*temp = *qi.ExpandItem.Filter.Tree
 						fq := &godata.GoDataFilterQuery{
@@ -401,10 +413,8 @@ func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem,
 						}
 
 						qi.ExpandItem.Filter = fq
-
 					} else {
 						qi.ExpandItem.Filter = o.Filter
-
 					}
 				}
 
@@ -444,9 +454,10 @@ func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem,
 // Convert receives a name such as phenomenonTime and returns "data ->> 'id'" true, returns
 // false if parameter cannot be converted
 func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.QueryOptions, prefix string, alterLocation bool) string {
-	// Only select last Location since we only have 1 encoding	
+	// Only select last Location since we only have 1 encoding
 	if alterLocation && et == entities.EntityTypeLocation {
 		top := godata.GoDataTopQuery(1)
+
 		if qo == nil {
 			nQo := &odata.QueryOptions{}
 			qo = nQo
@@ -456,13 +467,14 @@ func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.Q
 	}
 
 	q := ""
+
 	if qo != nil && qo.Filter != nil {
 		filterString := qb.createFilter(et, qo.Filter.Tree, false)
 		if filterString == "" {
 			return q
 		}
 
-		q += fmt.Sprintf("%s ", prefix)
+		q += prefix + " "
 		q += filterString
 	}
 
@@ -486,9 +498,11 @@ func (qb *QueryBuilder) filterToString(pn *godata.ParseNode, et entities.EntityT
 }
 
 func (qb *QueryBuilder) prepareFilter(et entities.EntityType, originalLeft, left, originalRight, right string) (string, string) {
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		var oStr []*string
+
 		var str []*string
+
 		if i == 0 {
 			oStr = []*string{&originalLeft, &originalRight}
 			str = []*string{&left, &right}
@@ -497,22 +511,24 @@ func (qb *QueryBuilder) prepareFilter(et entities.EntityType, originalLeft, left
 			str = []*string{&right, &left}
 		}
 
-		e := strings.Replace(fmt.Sprintf("%v", *oStr[1]), "'", "", -1)
-		property := strings.ToLower(fmt.Sprintf("%v", *oStr[0]))
+		e := strings.ReplaceAll(*oStr[1], "'", "")
+		property := strings.ToLower(*oStr[0])
 
 		if property == "encodingtype" {
 			et, err := entities.CreateEncodingType(e)
 			if err == nil {
-				*str[1] = fmt.Sprintf("%v", et.Code)
+				*str[1] = strconv.Itoa(et.Code)
 			}
+
 			return left, right
 		}
 
 		if property == "observationtype" {
 			et, err := entities.GetObservationTypeByValue(e)
 			if err == nil {
-				*str[1] = fmt.Sprintf("%v", et.Code)
+				*str[1] = strconv.FormatInt(et.Code, 10)
 			}
+
 			return left, right
 		}
 
@@ -566,7 +582,7 @@ func (qb *QueryBuilder) createArithmetic(et entities.EntityType, pn *godata.Pars
 // CastObservationResult converts an observation result query to a specified type (castTo)
 func (qb *QueryBuilder) CastObservationResult(input string, castTo string) string {
 	if input == "observation.data -> 'result'" {
-		return fmt.Sprintf("(observation.data ->> 'result')::%s", castTo)
+		return "(observation.data ->> 'result')::" + castTo
 	}
 
 	return input
@@ -574,17 +590,19 @@ func (qb *QueryBuilder) CastObservationResult(input string, castTo string) strin
 
 func (qb *QueryBuilder) createExtractDateQuery(pn *godata.ParseNode, et entities.EntityType, function string) string {
 	left := qb.createFilter(et, pn.Children[0], true)
+
 	return fmt.Sprintf("EXTRACT(%s FROM to_timestamp(%s,'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"'))", function, left)
 }
 
 func (qb *QueryBuilder) createSpatialQuery(pn *godata.ParseNode, et entities.EntityType, function string, params int) string {
-	if params == 1 {
+	switch params {
+	case 1:
 		return fmt.Sprintf(function, qb.addGeomFromGeoJSON(pn.Children[0].Token, qb.createFilter(et, pn.Children[0], true)))
-	} else if params == 2 {
+	case 2:
 		return fmt.Sprintf(function,
 			qb.addGeomFromGeoJSON(pn.Children[0].Token, qb.createFilter(et, pn.Children[0], true)),
 			qb.addGeomFromGeoJSON(pn.Children[1].Token, qb.createFilter(et, pn.Children[1], true)))
-	} else if params == 3 {
+	case 3:
 		return fmt.Sprintf(function,
 			qb.addGeomFromGeoJSON(pn.Children[0].Token, qb.createFilter(et, pn.Children[0], true)),
 			qb.addGeomFromGeoJSON(pn.Children[1].Token, qb.createFilter(et, pn.Children[1], true)),
@@ -643,6 +661,7 @@ func (qb *QueryBuilder) sortQueryOptions(qo *odata.QueryOptions) {
 	if qo != nil && qo.Filter != nil {
 		ce := make([]string, 0)
 		qb.sortFilter(qo, qo.Filter.Tree, qo.Filter.Tree, nil, &ce)
+
 		pn := &godata.ParseNode{}
 		fq := &godata.GoDataFilterQuery{}
 		fq.Tree = pn
@@ -669,6 +688,7 @@ func (qb *QueryBuilder) sortFilter(qo *odata.QueryOptions, pn *godata.ParseNode,
 		if pn.Children[0].Token.Type == godata.FilterTokenNav {
 			*currentExpand = append([]string{pn.Children[1].Token.Value}, *currentExpand...)
 			qb.sortFilter(qo, pn.Children[0], parentNode, startNavNode, currentExpand)
+
 			return
 		}
 
@@ -703,7 +723,7 @@ func (qb *QueryBuilder) sortFilter(qo *odata.QueryOptions, pn *godata.ParseNode,
 		*afterCouplingNode = godata.ParseNode{}
 	} else {
 		// look for more navigational filters
-		for i := 0; i < len(pn.Children); i++ {
+		for i := range len(pn.Children) {
 			c := pn.Children[i]
 			ne := make([]string, 0)
 			c.Parent = pn
@@ -730,17 +750,19 @@ func iterateParseNodeChilds(pn *godata.ParseNode, str string) string {
 
 func (qb *QueryBuilder) addExpand(qo *odata.QueryOptions, afterCouplingNode *godata.ParseNode, cp []string) {
 	addExpand := true
+
 	if qo.Expand != nil {
-		for i := 0; i < len(qo.Expand.ExpandItems); i++ {
+		for i := range len(qo.Expand.ExpandItems) {
 			e := qo.Expand.ExpandItems[i]
 			if len(cp) != len(e.Path) {
 				continue
 			}
 
-			for j := 0; j < len(cp); j++ {
+			for j := range len(cp) {
 				if cp[j] == e.Path[j].Value {
 					if j == len(cp)-1 {
 						addFilterToExpandItem(afterCouplingNode, e)
+
 						addExpand = false
 					}
 				} else {
@@ -767,6 +789,7 @@ func (qb *QueryBuilder) addExpand(qo *odata.QueryOptions, afterCouplingNode *god
 			if len(expandString) != 0 {
 				expandString += "/"
 			}
+
 			expandString += s
 		}
 
@@ -799,6 +822,7 @@ func (qb *QueryBuilder) cleanupFilter(pn *godata.ParseNode) {
 	for i := len(pn.Children) - 1; i >= 0; i-- {
 		current := pn.Children[i]
 		current.Parent = pn
+
 		if current.Children != nil && len(current.Children) > 0 {
 			qb.cleanupFilter(current)
 		}
@@ -807,6 +831,7 @@ func (qb *QueryBuilder) cleanupFilter(pn *godata.ParseNode) {
 	for i := len(pn.Children) - 1; i >= 0; i-- {
 		current := pn.Children[i]
 		current.Parent = pn
+
 		if current.Children != nil && len(current.Children) > 0 {
 			removeUnusedNodeFromParent(i, pn, current)
 		}
@@ -818,6 +843,7 @@ func removeUnusedNodeFromParent(i int, parent *godata.ParseNode, current *godata
 		// If 2 childs are found with empty token remove the node from it's parent
 		if current.Children[0].Token == nil && current.Children[1].Token == nil {
 			parent.Children = append(parent.Children[:i], parent.Children[i+1:]...)
+
 			return
 		}
 
@@ -838,7 +864,7 @@ func addFilterToExpandItem(pn *godata.ParseNode, ei *godata.ExpandItem) {
 	copyParseNode := &godata.ParseNode{}
 	*copyParseNode = *pn
 
-	//add filter to tree, if there is already a filter get if there is an and or or in front
+	// add filter to tree, if there is already a filter get if there is an and or or in front
 	if ei.Filter == nil {
 		ei.Filter = &godata.GoDataFilterQuery{Tree: copyParseNode}
 	} else {
@@ -884,9 +910,11 @@ func findFirstCouplingParseNode(pn *godata.ParseNode) *godata.ParseNode {
 }
 
 // CreateCountQuery creates the correct count query based on the given info
-//   e1: entity to get
-//   e2: from entity
-//   id: e2 == nil: where e1.id = ... | e2 != nil: where e2.id = ...
+//
+//	e1: entity to get
+//	e2: from entity
+//	id: e2 == nil: where e1.id = ... | e2 != nil: where e2.id = ...
+//
 // Returns an empty string if ODATA Query Count is set to false.
 // example: Datastreams(1)/Thing = CreateCountQuery(&entities.Thing, &entities.Datastream, 1, nil)
 func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, queryOptions *odata.QueryOptions) string {
@@ -904,9 +932,11 @@ func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity,
 }
 
 // CreateQuery creates a new count query based on given input
-//   e1: entity to get
-//   e2: from entity
-//   id: e2 == nil: where e1.id = ... | e2 != nil: where e2.id = ...
+//
+//	e1: entity to get
+//	e2: from entity
+//	id: e2 == nil: where e1.id = ... | e2 != nil: where e2.id = ...
+//
 // example: Datastreams(1)/Thing = CreateQuery(&entities.Thing, &entities.Datastream, 1, nil)
 func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, queryOptions *odata.QueryOptions) (string, *QueryParseInfo) {
 	if logger.Logger.Level == log.DebugLevel {
@@ -970,12 +1000,12 @@ func (qb *QueryBuilder) getQueryString(e1 entities.Entity, e2 entities.Entity, i
 
 	if qo != nil && qo.Filter != nil {
 		if id != nil {
-			if e2 == nil {				
+			if e2 == nil {
 				where = fmt.Sprintf("%s AND %s", where, qb.getFilterQueryString(et1, qo, "", true))
-			} else {				
+			} else {
 				where = fmt.Sprintf("%s %s", where, qb.getFilterQueryString(et1, qo, "WHERE", true))
 			}
-		} else {			
+		} else {
 			where = fmt.Sprintf("%s %s", where, qb.getFilterQueryString(et1, qo, "WHERE", false))
 		}
 	}
@@ -985,6 +1015,7 @@ func (qb *QueryBuilder) getQueryString(e1 entities.Entity, e2 entities.Entity, i
 	// get entity by other entity
 	if e2 != nil {
 		selectBy := qb.createSelectByRelationString(e1, e2, id, qpi)
+
 		prefix := "WHERE"
 		if where != "" {
 			prefix = "AND"

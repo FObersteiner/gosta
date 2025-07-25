@@ -20,9 +20,9 @@ func TestFoiParamFactory(t *testing.T) {
 	entitytype := entity.GetEntityType()
 
 	// assert
-	assert.True(t, entity != nil)
+	assert.NotEqual(t, entity, nil)
 	// entities..
-	assert.True(t, err == nil)
-	assert.True(t, entity.GetID() == 4)
-	assert.True(t, entitytype == entities.EntityTypeFeatureOfInterest)
+	assert.Equal(t, err, nil)
+	assert.Equal(t, entity.GetID(), 4)
+	assert.Equal(t, entitytype, entities.EntityTypeFeatureOfInterest)
 }

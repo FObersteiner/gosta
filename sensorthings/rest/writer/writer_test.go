@@ -2,15 +2,16 @@ package writer
 
 import (
 	"errors"
-	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"strconv"
+	"testing"
+
 	entities "github.com/gost/core"
 	"github.com/gost/godata"
 	"github.com/gost/server/sensorthings/odata"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 func TestSendErrorWithNoError(t *testing.T) {
@@ -21,7 +22,7 @@ func TestSendErrorWithNoError(t *testing.T) {
 	SendError(rr, nil, true)
 
 	// assert
-	assert.True(t, rr.Code == http.StatusInternalServerError)
+	assert.Equal(t, rr.Code, http.StatusInternalServerError)
 }
 
 func TestSendErrorWithNoIdentJson(t *testing.T) {
@@ -34,7 +35,7 @@ func TestSendErrorWithNoIdentJson(t *testing.T) {
 	SendJSONResponse(rr, http.StatusTeapot, thing, nil, false)
 
 	// assert
-	assert.True(t, rr.Code == http.StatusTeapot)
+	assert.Equal(t, rr.Code, http.StatusTeapot)
 }
 
 func TestSendErrorWithError(t *testing.T) {
@@ -47,7 +48,7 @@ func TestSendErrorWithError(t *testing.T) {
 	SendError(rr, errs, false)
 
 	// assert
-	assert.True(t, rr.Code == http.StatusInternalServerError)
+	assert.Equal(t, rr.Code, http.StatusInternalServerError)
 }
 
 func TestSendJsonResponseWithNoData(t *testing.T) {
@@ -58,7 +59,7 @@ func TestSendJsonResponseWithNoData(t *testing.T) {
 	SendJSONResponse(rr, http.StatusTeapot, nil, nil, false)
 
 	// assert
-	assert.True(t, rr.Code == http.StatusOK)
+	assert.Equal(t, rr.Code, http.StatusOK)
 }
 
 func TestSendJsonResponseWithData(t *testing.T) {
@@ -71,7 +72,7 @@ func TestSendJsonResponseWithData(t *testing.T) {
 	SendJSONResponse(rr, http.StatusTeapot, thing, nil, false)
 
 	// assert
-	assert.True(t, rr.Code == http.StatusTeapot)
+	assert.Equal(t, rr.Code, http.StatusTeapot)
 }
 
 func TestSendJsonResponseWithDataAndQueryOptions(t *testing.T) {
@@ -89,7 +90,7 @@ func TestSendJsonResponseWithDataAndQueryOptions(t *testing.T) {
 	SendJSONResponse(rr, http.StatusTeapot, thing, qo, false)
 
 	// assert
-	assert.True(t, rr.Code == http.StatusTeapot)
+	assert.Equal(t, rr.Code, http.StatusTeapot)
 }
 
 func TestSendJsonResponseErrorOnMarshalError(t *testing.T) {
@@ -160,7 +161,7 @@ func TestCountCollection(t *testing.T) {
 
 	// assert
 	assert.Equal(t, http.StatusOK, rr.Code)
-	assert.Equal(t, string(body), fmt.Sprintf("%v", ar.Count))
+	assert.Equal(t, string(body), strconv.Itoa(ar.Count))
 }
 
 func TestCountCollectionError(t *testing.T) {

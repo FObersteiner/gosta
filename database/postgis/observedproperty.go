@@ -14,18 +14,20 @@ import (
 
 func observedPropertyParamFactory(values map[string]interface{}) (entities.Entity, error) {
 	op := &entities.ObservedProperty{}
+
 	for as, value := range values {
 		if value == nil {
 			continue
 		}
 
-		if as == asMappings[entities.EntityTypeObservedProperty][observedPropertyID] {
+		switch as {
+		case asMappings[entities.EntityTypeObservedProperty][observedPropertyID]:
 			op.ID = value
-		} else if as == asMappings[entities.EntityTypeObservedProperty][observedPropertyName] {
+		case asMappings[entities.EntityTypeObservedProperty][observedPropertyName]:
 			op.Name = value.(string)
-		} else if as == asMappings[entities.EntityTypeObservedProperty][observedPropertyDescription] {
+		case asMappings[entities.EntityTypeObservedProperty][observedPropertyDescription]:
 			op.Description = value.(string)
-		} else if as == asMappings[entities.EntityTypeObservedProperty][observedPropertyDefinition] {
+		case asMappings[entities.EntityTypeObservedProperty][observedPropertyDefinition]:
 			op.Definition = value.(string)
 		}
 	}
@@ -41,6 +43,7 @@ func (gdb *GostDatabase) GetObservedProperty(id interface{}, qo *odata.QueryOpti
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.ObservedProperty{}, nil, intID, qo)
+
 	observedProperty, err := processObservedProperty(gdb.Db, query, qi)
 	if err != nil {
 		return nil, err
@@ -57,6 +60,7 @@ func (gdb *GostDatabase) GetObservedPropertyByDatastream(id interface{}, qo *oda
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.ObservedProperty{}, &entities.Datastream{}, intID, qo)
+
 	observedProperty, err := processObservedProperty(gdb.Db, query, qi)
 	if err != nil {
 		return nil, err
@@ -69,6 +73,7 @@ func (gdb *GostDatabase) GetObservedPropertyByDatastream(id interface{}, qo *oda
 func (gdb *GostDatabase) GetObservedProperties(qo *odata.QueryOptions) ([]*entities.ObservedProperty, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.ObservedProperty{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.ObservedProperty{}, nil, nil, qo)
+
 	return processObservedProperties(gdb.Db, query, qo, qi, countSQL)
 }
 
@@ -88,10 +93,11 @@ func processObservedProperty(db *sql.DB, sql string, qi *QueryParseInfo) (*entit
 func processObservedProperties(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string) ([]*entities.ObservedProperty, int, bool, error) {
 	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
-		return nil, 0, hasNext, fmt.Errorf("Error executing query %v", err)
+		return nil, 0, hasNext, fmt.Errorf("Error executing query %w", err)
 	}
 
 	obs := make([]*entities.ObservedProperty, 0)
+
 	for _, d := range data {
 		entity := d.(*entities.ObservedProperty)
 		obs = append(obs, entity)
@@ -101,7 +107,7 @@ func processObservedProperties(db *sql.DB, sql string, qo *odata.QueryOptions, q
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, hasNext, fmt.Errorf("Error executing count %v", err)
+			return nil, 0, hasNext, fmt.Errorf("Error executing count %w", err)
 		}
 	}
 
@@ -111,13 +117,16 @@ func processObservedProperties(db *sql.DB, sql string, qo *odata.QueryOptions, q
 // PostObservedProperty adds an ObservedProperty to the database
 func (gdb *GostDatabase) PostObservedProperty(op *entities.ObservedProperty) (*entities.ObservedProperty, error) {
 	var opID int
+
 	query := fmt.Sprintf("INSERT INTO %s.observedproperty (name, definition, description) VALUES ($1, $2, $3) RETURNING id", gdb.Schema)
+
 	err := gdb.Db.QueryRow(query, op.Name, op.Definition, op.Description).Scan(&opID)
 	if err != nil {
 		return nil, err
 	}
 
 	op.ID = opID
+
 	return op, nil
 }
 
@@ -134,8 +143,11 @@ func (gdb *GostDatabase) ObservedPropertyExists(id interface{}) bool {
 // PatchObservedProperty updates a ObservedProperty in the database
 func (gdb *GostDatabase) PatchObservedProperty(id interface{}, op *entities.ObservedProperty) (*entities.ObservedProperty, error) {
 	var err error
+
 	var ok bool
+
 	var intID int
+
 	updates := make(map[string]interface{})
 
 	if intID, ok = ToIntID(id); !ok || !gdb.ObservedPropertyExists(intID) {
@@ -159,6 +171,7 @@ func (gdb *GostDatabase) PatchObservedProperty(id interface{}, op *entities.Obse
 	}
 
 	ns, _ := gdb.GetObservedProperty(intID, nil)
+
 	return ns, nil
 }
 

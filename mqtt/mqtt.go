@@ -28,8 +28,8 @@ type MQTT struct {
 	caCertPath      string
 	clientCertPath  string
 	privateKeyPath  string
-	keepAliveSec 	int
-	pingTimeoutSec	int
+	keepAliveSec    int
+	pingTimeoutSec  int
 	subscriptionQos byte
 	persistent      bool
 	order           bool
@@ -38,7 +38,7 @@ type MQTT struct {
 	client          paho.Client
 	verbose         bool
 	api             *models.API
-	connectToken 	*paho.ConnectToken
+	connectToken    *paho.ConnectToken
 }
 
 func setupLogger(verbose bool) {
@@ -58,7 +58,7 @@ func setupLogger(verbose bool) {
 }
 
 func (m *MQTT) getProtocol() string {
-	if m.sslEnabled == true {
+	if m.sslEnabled {
 		return "ssl"
 	} else {
 		return "tcp"
@@ -66,12 +66,12 @@ func (m *MQTT) getProtocol() string {
 }
 
 func initMQTTClientOptions(client *MQTT) (*paho.ClientOptions, error) {
-
 	opts := paho.NewClientOptions() // uses defaults: https://godoc.org/github.com/eclipse/paho.mqtt.golang#NewClientOptions
 
 	if client.username != "" {
 		opts.SetUsername(client.username)
 	}
+
 	if client.password != "" {
 		opts.SetPassword(client.password)
 	}
@@ -79,27 +79,29 @@ func initMQTTClientOptions(client *MQTT) (*paho.ClientOptions, error) {
 	// TLS CONFIG
 	tlsConfig := &tls.Config{}
 	if client.caCertPath != "" {
-
 		// Import trusted certificates from CAfile.pem.
 		// Alternatively, manually add CA certificates to
 		// default openssl CA bundle.
 		tlsConfig.RootCAs = x509.NewCertPool()
 		pemCerts, err := ioutil.ReadFile(client.caCertPath)
+
 		if err == nil {
 			tlsConfig.RootCAs.AppendCertsFromPEM(pemCerts)
 		}
 	}
+
 	if client.clientCertPath != "" && client.privateKeyPath != "" {
 		// Import client certificate/key pair
 		cert, err := tls.LoadX509KeyPair(client.clientCertPath, client.privateKeyPath)
 		if err != nil {
-			return nil, fmt.Errorf("error loading client keypair: %s", err)
+			return nil, fmt.Errorf("error loading client keypair: %w", err)
 		}
 		// Just to print out the client certificate..
 		cert.Leaf, err = x509.ParseCertificate(cert.Certificate[0])
 		if err != nil {
-			return nil, fmt.Errorf("error parsing client certificate: %s", err)
+			return nil, fmt.Errorf("error parsing client certificate: %w", err)
 		}
+
 		tlsConfig.Certificates = []tls.Certificate{cert}
 	}
 
@@ -114,6 +116,7 @@ func initMQTTClientOptions(client *MQTT) (*paho.ClientOptions, error) {
 	opts.SetAutoReconnect(false)
 	opts.SetConnectionLostHandler(client.connectionLostHandler)
 	opts.SetOnConnectHandler(client.connectHandler)
+
 	return opts, nil
 }
 
@@ -135,8 +138,8 @@ func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
 		caCertPath:      config.CaCertFile,
 		clientCertPath:  config.ClientCertFile,
 		privateKeyPath:  config.PrivateKeyFile,
-		keepAliveSec:	 config.KeepAliveSec,
-		pingTimeoutSec:	 config.PingTimeoutSec,
+		keepAliveSec:    config.KeepAliveSec,
+		pingTimeoutSec:  config.PingTimeoutSec,
 	}
 
 	opts, err := initMQTTClientOptions(mqttClient)
@@ -154,7 +157,7 @@ func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
 func (m *MQTT) Start(api *models.API) {
 	m.api = api
 	logger.Infof("Starting MQTT client on %s://%s:%v with Prefix:%v, Persistence:%v, OrderMatters:%v, KeepAlive:%v, PingTimeout:%v, QOS:%v",
-		m.getProtocol(), m.host, m.port,m.prefix,m.persistent,m.order,m.keepAliveSec,m.pingTimeoutSec,m.subscriptionQos )
+		m.getProtocol(), m.host, m.port, m.prefix, m.persistent, m.order, m.keepAliveSec, m.pingTimeoutSec, m.subscriptionQos)
 	m.connect()
 }
 
@@ -200,13 +203,17 @@ func (m *MQTT) connect() {
 // machine and GOST is started before mosquito
 func (m *MQTT) retryConnect() {
 	logger.Infof("MQTT client starting reconnect procedure in background")
+
 	m.connecting = true
 	ticker := time.NewTicker(time.Second * 5)
+
 	go func() {
 		for range ticker.C {
 			m.connect()
+
 			if m.client.IsConnected() {
 				ticker.Stop()
+
 				m.connecting = false
 			}
 		}
@@ -215,8 +222,9 @@ func (m *MQTT) retryConnect() {
 
 func (m *MQTT) connectHandler(c paho.Client) {
 	logger.Infof("MQTT client connected")
+
 	hasSession := m.connectToken.SessionPresent()
-	logger.Infof("MQTT Session present: %v", hasSession);
+	logger.Infof("MQTT Session present: %v", hasSession)
 
 	// on first connect, connection lost and persistance is off or no previous session found
 	if !m.disconnected || (m.disconnected && !m.persistent) || !hasSession {
@@ -226,9 +234,10 @@ func (m *MQTT) connectHandler(c paho.Client) {
 	m.disconnected = false
 }
 
-//ToDo: bubble up and call retryConnect?
+// ToDo: bubble up and call retryConnect?
 func (m *MQTT) connectionLostHandler(c paho.Client, err error) {
 	logger.Warnf("MQTT client lost connection: %v", err)
+
 	m.disconnected = true
 	m.retryConnect()
 }

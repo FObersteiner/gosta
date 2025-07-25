@@ -37,7 +37,6 @@ func setEnvironmentServerSettings(conf *Config) {
 	if gostServerExternalURI != "" {
 		conf.Server.ExternalURI = gostServerExternalURI
 		log.Println("External uri environment variable discovered: " + conf.Server.ExternalURI)
-
 	}
 
 	gostServerMaxEntities := os.Getenv("GOST_SERVER_MAX_ENTITIES")
@@ -176,11 +175,10 @@ func setEnvironmentMQTTSettings(conf *Config) {
 
 	gostMQTTSubscriptionQOS := os.Getenv("GOST_MQTT_SUBSCRIPTIONQOS")
 	if gostMQTTSubscriptionQOS != "" {
-		qos,err := strconv.ParseInt(gostMQTTSubscriptionQOS,0,8)
+		qos, err := strconv.ParseInt(gostMQTTSubscriptionQOS, 0, 8)
 		if err == nil {
 			conf.MQTT.SubscriptionQos = byte(qos)
 		}
-
 	}
 
 	gostMQTTPersistent := os.Getenv("GOST_MQTT_PERSISTENT")
@@ -223,13 +221,12 @@ func setEnvironmentMQTTSettings(conf *Config) {
 	}
 
 	gostMQTTClientCertFile := os.Getenv("GOST_MQTT_CLIENT_CERT_FILE")
-	if gostMQTTClientCertFile != ""{
+	if gostMQTTClientCertFile != "" {
 		conf.MQTT.ClientCertFile = gostMQTTClientCertFile
 	}
 
-
 	gostMQTTPrivateKeyFile := os.Getenv("GOST_MQTT_PRIVATE_KEY_FILE")
-	if gostMQTTPrivateKeyFile != ""{
+	if gostMQTTPrivateKeyFile != "" {
 		conf.MQTT.PrivateKeyFile = gostMQTTPrivateKeyFile
 	}
 
@@ -248,7 +245,6 @@ func setEnvironmentMQTTSettings(conf *Config) {
 			conf.MQTT.PingTimeoutSec = pingTimeout
 		}
 	}
-
 }
 
 func setEnvironmentLoggerSettings(conf *Config) {

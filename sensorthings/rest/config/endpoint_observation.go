@@ -15,7 +15,7 @@ func CreateObservationsEndpoint(externalURL string) *endpoint.Endpoint {
 		Name:       "Observations",
 		EntityType: entities.EntityTypeObservation,
 		OutputInfo: true,
-		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Observations")),
+		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, "Observations"),
 		SupportedExpandParams: []string{
 			"datastream",
 			"featureofinterest",

@@ -11,5 +11,5 @@ func TestCreateTopics(t *testing.T) {
 	// act
 	topics := CreateTopics("GOST")
 	// assert
-	assert.True(t, len(topics) > 0, "Must have more than zero topics")
+	assert.Positive(t, len(topics), "Must have more than zero topics")
 }

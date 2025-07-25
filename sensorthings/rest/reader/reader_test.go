@@ -1,16 +1,16 @@
 package reader
 
 import (
+	"bytes"
+	"errors"
+	"io"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	entities "github.com/gost/core"
 	gostErrors "github.com/gost/server/errors"
 	"github.com/stretchr/testify/assert"
-
-	"bytes"
-	"io/ioutil"
-	"net/http/httptest"
 
 	"github.com/gorilla/mux"
 )
@@ -31,11 +31,11 @@ func TestGetEntityId(t *testing.T) {
 	resp, _ := http.Get(ts.URL + "/v1.0/Things(35)")
 
 	// assert
-	assert.True(t, resp != nil)
-	assert.True(t, http.StatusOK == resp.StatusCode)
+	assert.NotEqual(t, resp, nil)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	body := resp.Body
-	result, _ := ioutil.ReadAll(body)
-	assert.True(t, string(result) == "35")
+	result, _ := io.ReadAll(body)
+	assert.Equal(t, string(result), "35")
 }
 
 func TestCheckContentTypeWithoutHeadersShouldReturnFalse(t *testing.T) {
@@ -54,6 +54,7 @@ func TestCheckContentTypeWithContentTypeHeaderShouldReturnTrue(t *testing.T) {
 	// arrange
 	req, _ := http.NewRequest("GET", "/v1.0/Things(1)", nil)
 	req.Header.Add("Content-Type", "application/json")
+
 	w := httptest.NewRecorder()
 
 	// act
@@ -67,6 +68,7 @@ func TestCheckContentTypeWithoutContentTypeHeaderShouldReturnFalse(t *testing.T)
 	// arrange
 	req, _ := http.NewRequest("GET", "/v1.0/Things(1)", nil)
 	req.Header.Add("Content-Type", "superformat")
+
 	w := httptest.NewRecorder()
 
 	// act
@@ -124,9 +126,9 @@ func TestParseEntity(t *testing.T) {
 	fErr := ParseEntity(featureOfinterest, nil)
 
 	// assert
-	assert.Nil(t, tErr)
-	assert.Equal(t, thing.Name, "thing1")
-	assert.Equal(t, thing.Description, "test thing 1")
+	assert.NoError(t, tErr)
+	assert.Equal(t, "thing1", thing.Name)
+	assert.Equal(t, "test thing 1", thing.Description)
 	assert.Equal(t, 400, getStatusCode(lErr))
 	assert.Equal(t, 400, getStatusCode(hlErr))
 	assert.Equal(t, 400, getStatusCode(dErr))
@@ -137,9 +139,12 @@ func TestParseEntity(t *testing.T) {
 }
 
 func getStatusCode(err error) int {
-	switch e := err.(type) {
-	case gostErrors.APIError:
-		return e.GetHTTPErrorStatusCode()
+	{
+		var e gostErrors.APIError
+		switch {
+		case errors.As(err, &e):
+			return e.GetHTTPErrorStatusCode()
+		}
 	}
 
 	return 0

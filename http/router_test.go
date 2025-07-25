@@ -24,7 +24,7 @@ func setup() {
 	a := api.NewAPI(database, cfg, mqttServer)
 	router = CreateRouter(&a)
 
-	//The response recorder used to record HTTP responses
+	// The response recorder used to record HTTP responses
 	respRec = httptest.NewRecorder()
 }
 
@@ -40,6 +40,7 @@ func TestCreateRouter(t *testing.T) {
 func TestEndpoints(t *testing.T) {
 	req, _ = http.NewRequest("GET", "/v1.0", nil)
 	router.ServeHTTP(respRec, req)
+
 	if respRec.Code != http.StatusOK {
 		t.Fatal("Server endpoint /v1.0 error: Returned ", respRec.Code, " instead of ", http.StatusOK)
 	}

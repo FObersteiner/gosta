@@ -15,7 +15,7 @@ func CreateThingsEndpoint(externalURL string) *endpoint.Endpoint {
 		Name:       "Things",
 		EntityType: entities.EntityTypeThing,
 		OutputInfo: true,
-		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Things")),
+		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, "Things"),
 		SupportedExpandParams: []string{
 			"locations",
 			"datastreams",
