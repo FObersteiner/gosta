@@ -1,11 +1,10 @@
 package postgis
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
-
-	"database/sql"
 
 	entities "github.com/gost/core"
 	"github.com/gost/now"
@@ -13,7 +12,7 @@ import (
 	"github.com/gost/server/sensorthings/odata"
 )
 
-func datastreamParamFactory(values map[string]interface{}) (entities.Entity, error) {
+func datastreamParamFactory(values map[string]any) (entities.Entity, error) {
 	ds := &entities.Datastream{}
 
 	for as, value := range values {
@@ -60,7 +59,7 @@ func datastreamParamFactory(values map[string]interface{}) (entities.Entity, err
 }
 
 // GetObservedArea returns the observed area of all observations of datastream
-func (gdb *GostDatabase) GetObservedArea(id int) (map[string]interface{}, error) {
+func (gdb *GostDatabase) GetObservedArea(id int) (map[string]any, error) {
 	sqlString := "select ST_AsGeoJSON(ST_ConvexHull(ST_Collect(feature))) as geom from %s.featureofinterest where id in (select distinct featureofinterest_id from %s.observation where stream_id=%v)"
 	sql2 := fmt.Sprintf(sqlString, gdb.Schema, gdb.Schema, id)
 	rows, err := gdb.Db.Query(sql2)
@@ -103,7 +102,7 @@ func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (
 	if qo != nil {
 		hasSelectQuery := (qo.Select != nil)
 
-		var containsObservedArea = true
+		containsObservedArea := true
 
 		if hasSelectQuery {
 			containsObservedArea = ContainsToLower(qo.Select.SelectItems, "observedArea")
@@ -270,7 +269,6 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 	}
 	// get the ObservationType id in the lookup table
 	observationType, err := entities.GetObservationTypeByValue(d.ObservationType)
-
 	if err != nil {
 		return nil, gostErrors.NewBadRequestError(errors.New("ObservationType does not exist"))
 	}

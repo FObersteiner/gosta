@@ -122,6 +122,7 @@ func TestCreateJoinWithExpand(t *testing.T) {
 	join := qb.createJoin(thing, location, 1, true, false, nil, nil, "")
 	assert.Equal(t, "LEFT JOIN LATERAL (SELECT location.id AS location_id, location.name AS location_name, location.description AS location_description, location.encodingtype AS location_encodingtype, location.geojson::text AS location_geojson FROM v1.0.location INNER JOIN v1.0.thing_to_location ON thing_to_location.location_id = location.id AND thing_to_location.thing_id = thing.id  ORDER BY location.id DESC LIMIT 1 OFFSET 0) AS location on true ", join, join)
 }
+
 func TestCreateCountQuery(t *testing.T) {
 	// arrange
 	qb := CreateQueryBuilder("v1.0", 1)
@@ -234,8 +235,10 @@ func TestConstructQueryParseInfo(t *testing.T) {
 func TestSortQueryOptionsScenario1(t *testing.T) {
 	// arrange
 	qb := CreateQueryBuilder("v1", 1)
-	uri, _ := url.Parse("localhost/v1.0/Observations?$filter=Datastream/id eq 1")
-	qo, _ := odata.ParseURLQuery(uri.Query())
+	uri, err := url.Parse("localhost/v1.0/Observations?$filter=Datastream/id eq 1")
+	assert.NoError(t, err)
+	qo, err := odata.ParseURLQuery(uri.Query())
+	assert.NoError(t, err)
 
 	// act
 	qb.sortQueryOptions(qo)
